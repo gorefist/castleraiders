@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Castle Raiders by Sergio D. Jubera</title>
+
+        <link rel="stylesheet" type="text/css" href="styles.css"/>
+
+        <!-- External JS libs -->
+        <script type="text/javascript" src="scripts/Box2dWeb-2.1.a.3.min.js"></script>
+
+        <!-- Game JS code -->
+        <script type="text/javascript" src="scripts/core.js"></script>
+        <script type="text/javascript" src="scripts/auxFunctions.js"></script>
+
+        <script type="text/javascript" src="scripts/SpriteSheet.js"></script>
+        <script type="text/javascript" src="scripts/PhysicsEngine.js"></script>
+        <script type="text/javascript" src="scripts/GameEngine.js"></script>
+        <script type="text/javascript" src="scripts/InputEngine.js"></script>
+        <script type="text/javascript" src="scripts/Entity.js"></script>
+        <script type="text/javascript" src="scripts/Soldier.js"></script>
+        <script type="text/javascript" src="scripts/Animation.js"></script>
+        <script type="text/javascript" src="scripts/HeartItem.js"></script>
+        <script type="text/javascript" src="scripts/ChestItem.js"></script>
+                <script type="text/javascript" src="scripts/InstancedEffect.js"></script>
+
+        <script type="text/javascript">
+            // [Sergio D. Jubera]
+            // I got this from the GRITS code ;)
+            // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+            window.requestAnimFrame = (function() {
+                return  window.requestAnimationFrame ||
+                        window.webkitRequestAnimationFrame ||
+                        window.mozRequestAnimationFrame ||
+                        function(callback) {
+                            window.setTimeout(callback, 1000 / 60);
+                        };
+            })();
+        </script>
+
+    </head>
+    <body oncontextmenu="return false;"> <!-- to disable right click on canvas -->
+
+    <canvas id="game_canvas" width="1200" height="500"></canvas>
+
+    <script type="text/javascript">
+
+        // 1. Initializations
+        var canvas = document.getElementById('game_canvas');
+        var ctx = canvas.getContext('2d');
+
+        var gContentLoaded = false; //used to await assets loading
+
+        // 2. Load assets
+
+        gGameEngine.loadAssets();
+
+        // 3. Setup engines
+
+        //gInputEngine.setup();
+        //gGameEngine.setup();    //Includes PhysEng setup
+
+        // 4. Run!!
+
+        //sample code to check the content of the loaded sprite sheet
+        var animate = function() {
+            if (!gContentLoaded)
+                return;
+
+            gGameEngine.run();
+        };
+
+        //setInterval(animate, 1000 / 60); 
+        (function animloop() {
+            requestAnimFrame(animloop);
+            animate();
+        })();
+    </script>
+</body>
+
+</html>

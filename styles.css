@@ -1,0 +1,14 @@
+body
+{
+    background-color: black;
+}
+
+canvas
+{
+    background-color: white;
+
+    /* Disable canvas selection */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
