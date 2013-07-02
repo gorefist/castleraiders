@@ -11,7 +11,7 @@ AnimationClass = Class.extend({
     frames: [], // list of ordered sprites that compound the animation
     currentFrame: 0.0,
     loop: true,
-    speed: 0.25, //allows different animations to flow at different pace
+    speed: DEFAULT_ANIM_SPEED, //allows different animations to flow at different pace
     offset: { x: 0, y: 0 },
     init: function(animOffset)
     {

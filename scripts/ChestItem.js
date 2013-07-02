@@ -3,7 +3,6 @@
 
 var CHEST_SIZE = {w: 16, h: 16};
 var CHEST_SIZE_SMALL = {w: 8, h: 8};
-var CHEST_ANIM_SPEED = 0.15;
 var CHEST_ANIM_OFFSET = {x: 0, y: -8};   // Needed for the pseudo-3D effect
 
 ChestItemClass = EntityClass.extend({

@@ -70,4 +70,16 @@ function quantizeAngle(vector, sectors)
 {
     return (Math.round(Math.atan2(vector.y, vector.x) / (2 * Math.PI) * sectors) + sectors) % sectors;
 }
+
+// Converts value from meters to pixels.
+// http://box2d.org/2011/12/pixels/
+function toPixels(meters) {
+    return meters * 0.02;
+}
+
+// Converts value from pixels to meters.
+// http://box2d.org/2011/12/pixels/
+function toMeters(pixels) {
+    return pixels * 50.0;
+}
         

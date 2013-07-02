@@ -31,8 +31,8 @@ EntityClass = Class.extend({
             userData: {
                 id: ++gGameEngine.gLastEntityGuid, // for debug and attack handling
                 ent: this   // for collision handling
-            }
-            //damping: 0    // not used
+            },
+            damping: 0
         };
 
         // Call our physics engine's addBody method
@@ -55,7 +55,11 @@ EntityClass = Class.extend({
             ctx.stroke();
 
             // Draw physic body type (for debug)
-            var textToDisplay = this.physBody.GetType() === Body.b2_staticBody ? 'static' : this.physBody.GetType() === Body.b2_dynamicBody ? 'dynamic' : 'unknown body type';
+            var textToDisplay = "type=" + (this.physBody.GetType() === Body.b2_staticBody ? 'static' : this.physBody.GetType() === Body.b2_dynamicBody ? 'dynamic' : 'unknown body type');
+            //textToDisplay += ", linear damping=" + this.physBody.GetDefinition().linearDamping;
+            var fixture = this.physBody.GetFixtureList();
+            //textToDisplay += ",density=" + fixture.GetDensity() + ",friction=" + fixture.GetFriction() + ",restitution=" + fixture.GetRestitution() + ",mass=" + fixture.GetMassData().mass;
+            textToDisplay += ",allowSleep=" + this.physBody.GetDefinition().allowSleep;
             font = " bold 10px sans-serif";
             ctx.textAlign = "left";
             ctx.textBaseline = "middle";

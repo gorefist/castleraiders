@@ -2,12 +2,24 @@
 // This is based on the same file from Udacity course, 
 // with some modifications which are commented properly, if any.
 
-// TO DO: read debug settings from file rather than hardcoding them
+// TO DO: read debug settings from file/game options rather than hardcoding them
 // Constants for debug
 var DEBUG_SHOW_FPS = true;
 var DEBUG_SHOW_PHYSIC_BODIES = true;
 var DEBUG_SHOW_ENTITIES = true; // draws entity array and their ids
 var DEBUG_SHOW_MAP_BOUNDS = true;
+
+// Constants for physics
+var PHYSICS_LOOP_HZ = 1.0 / 60.0; // 30 fps
+var PHYSICS_VELOCITY_ITERATIONS = 10;
+var PHYSICS_POSITION_ITERATIONS = 10;
+
+// Constants for animations
+var DEFAULT_WALKING_SPEED = 100; // Box2D works in MKS, so this is actually 
+var DEFAULT_ANIM_SPEED = 0.5;   // for humans & skeletons walking & attacking
+var DEATH_ANIM_SPEED = 0.25;    // for humans & skeletons dying
+var CHEST_ANIM_SPEED = 0.25;    // for treasure chest items
+var HEART_ANIM_SPEED = 0.3;     // for heart items
 
 // Constants for current soldier cursor
 
@@ -22,6 +34,10 @@ var SHOW_NAME_SKELETONS = true;
 var SHOW_LIFE_BAR_HUMANS = true;
 var SHOW_LIFE_BAR_SKELETONS = true;
 var SHOW_VALUE_ITEMS = true;
+
+// Constants for map data loading
+var MAP_ASSETS_SUBFOLDER = 'graphics';  // Subfolder from root (folder with index.html)
+// where the map image files are located
 
 // Game options
 var OPTIONS_FRIENDLY_FIRE = false;
@@ -46,10 +62,15 @@ GameEngineClass = Class.extend({
                     gSpriteSheets['animation'] = sheet;
                     sheet.load("graphics/animation_sprites.png");
                     sheet.parseAtlasDefinition(data.response);
-                    gContentLoaded = true;
-                    gInputEngine.setup();
-                    gGameEngine.setup();
+                    gAnimationsLoaded = true;
                 }, null);
+
+        // TO DO: unhardcode this so that level map depends on game progress or
+        // settings file or game options
+        var sheet = new SpriteSheetClass();
+        gSpriteSheets['map'] = sheet;
+        sheet.load("graphics/level1.png");
+        gMap.load("graphics/level1.json");
     },
     //-----------------------------
     setup: function() {
@@ -127,8 +148,6 @@ GameEngineClass = Class.extend({
         // Otherwise, push that entity onto the '_deferredKill'
         // list defined above.
 
-        var currentSoldierIdx_updateNeeded = false;
-
         for (var i = 0; i < gGameEngine.entities.length; i++) {
             var ent = gGameEngine.entities[i];
             if (!ent._killed)
@@ -204,6 +223,7 @@ GameEngineClass = Class.extend({
         {
             move_dir.Normalize();
             move_dir.Multiply(gGameEngine.currentSoldier().speed);
+            
             inputInfo.walking = true;
             inputInfo.move_dir = move_dir;
         }
@@ -259,6 +279,9 @@ GameEngineClass = Class.extend({
         //Translate coord. systems, based on current view position
         var trV = gGameEngine.calculateViewPointTranslation();
         ctx.translate(trV.x, trV.y);
+        
+        // Draw the map
+        gMap.draw(ctx);
         gGameEngine._drawWorldBounds(); // for debug
 
         // Draw cursor for current soldier
@@ -307,12 +330,12 @@ GameEngineClass = Class.extend({
         //Make sure it doesn't go beyond map bounds
         if (gGameEngine.currentSoldier().pos.x < (canvas.width / 2))
             translation.x = 0;
-        else if (gGameEngine.currentSoldier().pos.x > (gMap.width - canvas.width / 2))
-            translation.x = canvas.width / 2 - (gMap.width - canvas.width / 2);
+        else if (gGameEngine.currentSoldier().pos.x > (gMap.width() - canvas.width / 2))
+            translation.x = canvas.width / 2 - (gMap.width() - canvas.width / 2);
         if (gGameEngine.currentSoldier().pos.y < (canvas.height / 2))
             translation.y = 0;
-        else if (gGameEngine.currentSoldier().pos.y > (gMap.height - canvas.height / 2))
-            translation.y = canvas.height / 2 - (gMap.height - canvas.height / 2);
+        else if (gGameEngine.currentSoldier().pos.y > (gMap.height() - canvas.height / 2))
+            translation.y = canvas.height / 2 - (gMap.height() - canvas.height / 2);
         return translation;
     },
     _drawPointer: function()
@@ -365,7 +388,7 @@ GameEngineClass = Class.extend({
 //    ctx.fillText("Mouse: (" + gInputEngine.mouse.x + "," + gInputEngine.mouse.y + ")", 10, 10);
 //    ctx.fillText("Player: (" + gGameEngine.currentSoldier().pos.x + "," + gGameEngine.currentSoldier().pos.y + ")", 10, 20);
 //    ctx.fillText("Transl: (" + gGameEngine.translateViewPoint().x + "," + gGameEngine.translateViewPoint().y + ")", 10, 30);
-//    ctx.fillText("Map bounds: (" + gMap.width + "," + gMap.height + ")", 10, 40);
+//    ctx.fillText("Map bounds: (" + gMap.width() + "," + gMap.height() + ")", 10, 40);
 //    ctx.fillText("Canvas bounds: (" + canvas.width + "," + canvas.height + ")", 10, 50);
     },
     _drawWorldBounds: function()
@@ -373,19 +396,12 @@ GameEngineClass = Class.extend({
         if (DEBUG_SHOW_MAP_BOUNDS)
         {
             ctx.beginPath();
-            ctx.rect(0, 0, gMap.width, gMap.height);
-            ctx.fillStyle = '#004400';
-            ctx.fill();
             ctx.lineWidth = 10;
-            ctx.strokeStyle = 'green';
+            ctx.strokeStyle = 'lime';
+            ctx.rect(0, 0, gMap.width(), gMap.height());
             ctx.stroke();
         }
     }
 });
 
 var gGameEngine = new GameEngineClass();
-
-var gMap = {
-    width: 1500,
-    height: 1000
-};

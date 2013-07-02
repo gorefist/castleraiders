@@ -22,7 +22,7 @@ SoldierClass = EntityClass.extend({
     name: "Soldier 1", // it could be customized and displayed so that you can
     // have your custom army, and for skeletons it may be used for bosses, etc.
     drawName: true,
-    speed: 100,
+    speed: DEFAULT_WALKING_SPEED,
     inputInfo: null, //contains last input from keyboard and/or mouse
     // Here I'd add other features like shield, power attack, etc.
 
@@ -155,7 +155,8 @@ SoldierClass = EntityClass.extend({
         if (this.currentState.action !== 'attack')  // Don't interrupt attack
         {   // animation
             this.currentState.action = 'walk';
-            gGameEngine.currentSoldier().physBody.SetLinearVelocity(move_dir);
+            
+            this.physBody.SetLinearVelocity(move_dir);
         }
     },
     _attack: function()

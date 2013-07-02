@@ -4,8 +4,6 @@
 // Once animation finishes it may be removed from game (item) or not (dead
 // soldier).
 
-var DEATH_ANIM_SPEED = 0.1;         // Specific anim. speed for death
-
 InstancedEffectClass = EntityClass.extend({
     _animation: null,
     _removeWhenFinished: true,

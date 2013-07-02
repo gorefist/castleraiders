@@ -18,7 +18,6 @@ RevoluteJointDef = Box2D.Dynamics.Joints.b2RevoluteJointDef;
 
 PhysicsEngineClass = Class.extend({
     world: null,
-    PHYSICS_LOOP_HZ: 1.0 / 60.0, // 30 fps
 
     //-----------------------------------------
     create: function() {
@@ -32,9 +31,9 @@ PhysicsEngineClass = Class.extend({
         var start = Date.now();
 
         gPhysicsEngine.world.Step(
-                gPhysicsEngine.PHYSICS_LOOP_HZ, //frame-rate
-                10, //velocity iterations
-                10                  //position iterations
+                PHYSICS_LOOP_HZ, //frame-rate
+                PHYSICS_VELOCITY_ITERATIONS, //velocity iterations
+                PHYSICS_POSITION_ITERATIONS  //position iterations
                 );
         gPhysicsEngine.world.ClearForces();
 
@@ -69,12 +68,19 @@ PhysicsEngineClass = Class.extend({
         bodyDef.type = entityDef.bodyType === 'dynamic' ? Body.b2_dynamicBody : Body.b2_staticBody;
         bodyDef.position.x = entityDef.x;
         bodyDef.position.y = entityDef.y;
-
+        //bodyDef.allowSleep = false;
+        if (entityDef.damping) bodyDef.linearDamping = entityDef.damping;
+        
         var body = gPhysicsEngine.registerBody(bodyDef);
         var fixtureDefinition = new FixtureDef();
 
         if (entityDef.useBouncyFixture) {
             fixtureDefinition.density = 1.0;
+            fixtureDefinition.friction = 0;
+            fixtureDefinition.restitution = 1.0;
+        }
+        else {
+            fixtureDefinition.density = 0.0;
             fixtureDefinition.friction = 0;
             fixtureDefinition.restitution = 1.0;
         }

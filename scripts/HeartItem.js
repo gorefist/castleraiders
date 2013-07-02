@@ -3,7 +3,6 @@
 
 var HEART_SIZE = {w: 8, h: 8};  // Make it slightly smaller to allow a more
 // natural effect when grabbing it
-var HEART_ANIM_SPEED = 0.1;
 var HEART_ANIM_OFFSET = {x: 0, y: 0};   // Needed for the pseudo-3D effect
 
 HeartItemClass = EntityClass.extend({
