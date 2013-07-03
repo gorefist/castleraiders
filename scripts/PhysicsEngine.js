@@ -1,6 +1,9 @@
 // [Sergio D. Jubera]
 // This is based on the same file from Udacity course, 
 // with some modifications which are commented properly, if any.
+// NOTE: all measures in Box2D are expressed in MKS (Meters, Kilos, Seconds)
+// so any coordinate and measure must be converted when communicating with the
+// physics engine. Check out auxFunction.js file for aux conversion functions.
 
 // These are global shorthands we declare for Box2D primitives
 // we'll be using very frequently.
@@ -31,7 +34,7 @@ PhysicsEngineClass = Class.extend({
         var start = Date.now();
 
         gPhysicsEngine.world.Step(
-                PHYSICS_LOOP_HZ, //frame-rate
+                GAME_LOOP_HZ, //frame-rate
                 PHYSICS_VELOCITY_ITERATIONS, //velocity iterations
                 PHYSICS_POSITION_ITERATIONS  //position iterations
                 );
@@ -66,8 +69,8 @@ PhysicsEngineClass = Class.extend({
         // and the entity object which owns this specific body (for collision
         // handling)
         bodyDef.type = entityDef.bodyType === 'dynamic' ? Body.b2_dynamicBody : Body.b2_staticBody;
-        bodyDef.position.x = entityDef.x;
-        bodyDef.position.y = entityDef.y;
+        bodyDef.position.x = toMeters(entityDef.x);
+        bodyDef.position.y = toMeters(entityDef.y);
         //bodyDef.allowSleep = false;
         if (entityDef.damping) bodyDef.linearDamping = entityDef.damping;
         
@@ -87,7 +90,7 @@ PhysicsEngineClass = Class.extend({
 
         // Now we define the shape of this object as a box
         fixtureDefinition.shape = new PolygonShape();
-        fixtureDefinition.shape.SetAsBox(entityDef.halfWidth, entityDef.halfHeight);
+        fixtureDefinition.shape.SetAsBox(toMeters(entityDef.halfWidth), toMeters(entityDef.halfHeight));
         body.CreateFixture(fixtureDefinition);
 
         return body;

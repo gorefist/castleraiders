@@ -35,7 +35,7 @@
                         window.webkitRequestAnimationFrame ||
                         window.mozRequestAnimationFrame ||
                         function(callback) {
-                            window.setTimeout(callback, 1000.0 / 60.0);
+                            window.setTimeout(callback, GAME_LOOP_MS);
                         };
             })();
         </script>

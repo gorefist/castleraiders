@@ -72,11 +72,11 @@ function quantizeAngle(vector, sectors)
 }
 
 // Converts value from meters to pixels. The 'scale' parameter indicates the
-// ratio modifier. If omitted, the ratio will be the default 1m:64px. Ratio also
+// ratio modifier. If omitted, the ratio will be the default 1m:50px. Ratio also
 // can be considered as zoom (1 = 100%).
 // http://box2d.org/2011/12/pixels/
 function toPixels(meters, scale) {
-    return meters * 50.0 * (scale ? scale : 1.0);
+    return meters * 50.0 * (scale ? scale : PIXEL_METER_SCALE ? PIXEL_METER_SCALE : 1.0);
 }
 
 // Converts value from pixels to meters. The 'scale' parameter indicates the
@@ -84,6 +84,6 @@ function toPixels(meters, scale) {
 // can be considered as zoom (1 = 100%).
 // http://box2d.org/2011/12/pixels/
 function toMeters(pixels, scale) {
-    return pixels * 0.02 / (scale ? scale : 1.0);
+    return pixels * 0.02 / (scale ? scale : PIXEL_METER_SCALE ? PIXEL_METER_SCALE : 1.0);
 }
         

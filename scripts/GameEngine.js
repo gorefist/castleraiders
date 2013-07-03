@@ -9,8 +9,13 @@ var DEBUG_SHOW_PHYSIC_BODIES = true;
 var DEBUG_SHOW_ENTITIES = true; // draws entity array and their ids
 var DEBUG_SHOW_MAP_BOUNDS = true;
 
+// Game constants
+var DEFAULT_WALKING_VELOCITY = 3.0; // in m/s
+var GAME_LOOP_MS = 1000.0 / 60.0;   // # of milliseconds between scene drawings
+
 // Constants for physics
-var PHYSICS_LOOP_HZ = 1.0 / 60.0;     // 60 Hz = 60 updates per second
+var PIXEL_METER_SCALE = 1.0;          // ratio for pixel-meter conversion. Default is 1.0 (1m : 50px).
+var GAME_LOOP_HZ = 1.0 / 60.0;     // 60 Hz = 60 updates per second
 var PHYSICS_VELOCITY_ITERATIONS = 10; // # of iterations for velocity adjustment
 var PHYSICS_POSITION_ITERATIONS = 10; // # of iterations for overlap resolution
 
@@ -40,14 +45,11 @@ var SHOW_LIFE_BAR_HUMANS = true;
 var SHOW_LIFE_BAR_SKELETONS = true;
 var SHOW_VALUE_ITEMS = true;
 
-// Other constants for game entities
-var DEFAULT_WALKING_VELOCITY = 100; // in m/s
-
 // Constants for map data loading
 var MAP_ASSETS_SUBFOLDER = 'graphics';  // Subfolder from root (folder with index.html)
 // where the map image files are located
 
-// Game options
+// Game options (they should be set by users via game GUI, and read consequently).
 var OPTIONS_FRIENDLY_FIRE = false;
 
 GameEngineClass = Class.extend({
@@ -56,9 +58,15 @@ GameEngineClass = Class.extend({
     entities: [],
     factory: {},
     _deferredKill: [],
-    lastUpdate: null,
-    gLastEntityGuid: 0,
     userCoins: 0,
+    // The following attributes are used to keep constant FPS and update 
+    // frequency between different client machines (based on GRITS code):
+    lastUpdate: 0, // Date obj
+    timeSinceLastUpdate: 0, // seconds
+    // The following attributes are used to measure FPS for debug
+    frameCount: 0,
+    timeSinceLastFpsCheck: 0, // seconds
+    lastFps: 0,
     //-----------------------------
     init: function() {
         this.lastUpdate = new Date();
@@ -140,11 +148,34 @@ GameEngineClass = Class.extend({
         return ent;
     },
     run: function() {
-        gGameEngine.update(); //[Sergio D. Jubera] Update game
-        gGameEngine.updatePhysics(); // [Sergio D. Jubera] Update physics
-        gGameEngine.draw(); // [Sergio D. Jubera] Draw the scene
+        //gGameEngine.update(); //[Sergio D. Jubera] Update game
+        //gGameEngine.updatePhysics(); // [Sergio D. Jubera] Update physics
 
-        gGameEngine.lastUpdate = (new Date());
+        // This is based on GRITS code, to keep a constant update frequency 
+        // between different client machines:
+        this.frameCount++;
+
+        var timeElapsed = ((new Date()).getTime() - this.lastUpdate.getTime()) / 1000;
+        this.timeSinceLastUpdate += timeElapsed;
+
+        while (this.timeSinceLastUpdate >= GAME_LOOP_HZ) {
+            this.update();
+            this.updatePhysics();
+            this.timeSinceLastUpdate -= GAME_LOOP_HZ;
+        }
+
+        this.lastUpdate = (new Date());
+
+        // [Sergio D. Jubera]
+        // This is mine: measure FPS
+        this.timeSinceLastFpsCheck += timeElapsed;
+        if (this.timeSinceLastFpsCheck > 1) {
+            this.lastFps = (this.lastFps + this.frameCount) / 2;
+            this.timeSinceLastFpsCheck = 0;
+            this.frameCount = 0;
+        }
+
+        this.draw(); // [Sergio D. Jubera] Draw the scene
     },
     update: function() {
         // 1. Update living entities 
@@ -231,7 +262,7 @@ GameEngineClass = Class.extend({
         {
             move_dir.Normalize();
             move_dir.Multiply(gGameEngine.currentSoldier().speed);
-            
+
             inputInfo.walking = true;
             inputInfo.move_dir = move_dir;
         }
@@ -269,8 +300,8 @@ GameEngineClass = Class.extend({
                 var newPos = ent.physBody.GetPosition();
                 //console.log(ent.name + " (" + (ent.pos.x - newPos.x) + "," + (ent.pos.y - newPos.y) + ")");
 
-                ent.pos.x = newPos.x;
-                ent.pos.y = newPos.y;
+                ent.pos.x = toPixels(newPos.x);
+                ent.pos.y = toPixels(newPos.y);
 
                 ent.physBody.SetLinearVelocity(new Vec2(0, 0));
             }
@@ -287,7 +318,7 @@ GameEngineClass = Class.extend({
         //Translate coord. systems, based on current view position
         var trV = gGameEngine.calculateViewPointTranslation();
         ctx.translate(trV.x, trV.y);
-        
+
         // Draw the map
         gMap.draw(ctx);
         gGameEngine._drawWorldBounds(); // for debug
@@ -359,13 +390,13 @@ GameEngineClass = Class.extend({
     {
         if (DEBUG_SHOW_FPS)
         {
-            // Show FPS (FPS = 1 / timeElapsed(s))
-            var timeElapsed = ((new Date()).getTime() - gGameEngine.lastUpdate.getTime()) / 1000;
+            // Show FPS
             ctx.font = "15px sans-serif";
             ctx.textAlign = "right";
             ctx.textBaseline = "top";
             ctx.fillStyle = "#00ff00";
-            ctx.fillText(Math.round(1 / timeElapsed) + " FPS", canvas.width, 0);
+            ctx.fillText(this.lastFps.toFixed(1) // round with 1 decimal
+                    + " FPS", canvas.width, 0);
         }
 
         if (DEBUG_SHOW_ENTITIES)
@@ -413,3 +444,5 @@ GameEngineClass = Class.extend({
 });
 
 var gGameEngine = new GameEngineClass();
+
+var gLastEntityGuid = 0; // this is used to generate entities Ids for debug

@@ -23,13 +23,13 @@ EntityClass = Class.extend({
     setUpPhysics: function(bodyType)
     {
         var entityDef = {
-            x: this.pos.x,
-            y: this.pos.y,
-            halfHeight: this.size.h * 0.5,
-            halfWidth: this.size.w * 0.5,
+            x: this.pos.x, // Do NOT convert to meters, it will be converted by gPhysicsEngine.addBody()
+            y: this.pos.y, // Do NOT convert to meters, it will be converted by gPhysicsEngine.addBody()
+            halfHeight: this.size.h * 0.5, // Do NOT convert to meters, it will be converted by gPhysicsEngine.addBody()
+            halfWidth: this.size.w * 0.5, // Do NOT convert to meters, it will be converted by gPhysicsEngine.addBody()
             bodyType: bodyType ? bodyType : 'static',
             userData: {
-                id: ++gGameEngine.gLastEntityGuid, // for debug and attack handling
+                id: ++gLastEntityGuid, // for debug and attack handling
                 ent: this   // for collision handling
             },
             damping: 0
@@ -43,11 +43,16 @@ EntityClass = Class.extend({
     {
         if (DEBUG_SHOW_PHYSIC_BODIES)
         {
+            var physPos = {
+                x: toPixels(this.physBody.GetPosition().x),
+                y: toPixels(this.physBody.GetPosition().y)
+            };
+
             // Draw physic body (for debug)
             ctx.beginPath();
             ctx.rect(
-                    this.physBody.GetPosition().x - (this.size.w * 0.5),
-                    this.physBody.GetPosition().y - (this.size.h * 0.5),
+                    physPos.x - (this.size.w * 0.5),
+                    physPos.y - (this.size.h * 0.5),
                     this.size.w,
                     this.size.h);
             ctx.lineWidth = 2;
@@ -66,22 +71,27 @@ EntityClass = Class.extend({
             ctx.fillStyle = "#ff0000";
             ctx.fillText(
                     textToDisplay,
-                    this.physBody.GetPosition().x + (this.size.w * 0.5),
-                    this.physBody.GetPosition().y + (this.size.h * 0.5));
+                    physPos.x + (this.size.w * 0.5),
+                    physPos.y + (this.size.h * 0.5));
         }
     },
     drawEntityId: function(entityType)
     {
         if (DEBUG_SHOW_ENTITIES)
         {
+            var physPos = {
+                x: toPixels(this.physBody.GetPosition().x),
+                y: toPixels(this.physBody.GetPosition().y)
+            };
+            
             font = " bold 10px sans-serif";
             ctx.textAlign = "right";
             ctx.textBaseline = "middle";
             ctx.fillStyle = "white";
             ctx.fillText(
                     this.physBody.GetDefinition().userData.id + "_" + entityType,
-                    this.physBody.GetPosition().x - (this.size.w * 0.5),
-                    this.physBody.GetPosition().y + (this.size.h * 0.5));
+                    physPos.x - (this.size.w * 0.5),
+                    physPos.y + (this.size.h * 0.5));
         }
     }
 });
