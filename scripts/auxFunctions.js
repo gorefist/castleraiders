@@ -71,15 +71,19 @@ function quantizeAngle(vector, sectors)
     return (Math.round(Math.atan2(vector.y, vector.x) / (2 * Math.PI) * sectors) + sectors) % sectors;
 }
 
-// Converts value from meters to pixels.
+// Converts value from meters to pixels. The 'scale' parameter indicates the
+// ratio modifier. If omitted, the ratio will be the default 1m:64px. Ratio also
+// can be considered as zoom (1 = 100%).
 // http://box2d.org/2011/12/pixels/
-function toPixels(meters) {
-    return meters * 0.02;
+function toPixels(meters, scale) {
+    return meters * 50.0 * (scale ? scale : 1.0);
 }
 
-// Converts value from pixels to meters.
+// Converts value from pixels to meters. The 'scale' parameter indicates the
+// ratio modifier. If omitted, the ratio will be the default 1m:64px. Ratio also
+// can be considered as zoom (1 = 100%).
 // http://box2d.org/2011/12/pixels/
-function toMeters(pixels) {
-    return pixels * 50.0;
+function toMeters(pixels, scale) {
+    return pixels * 0.02 / (scale ? scale : 1.0);
 }
         

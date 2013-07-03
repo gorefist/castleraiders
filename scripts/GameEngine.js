@@ -10,12 +10,17 @@ var DEBUG_SHOW_ENTITIES = true; // draws entity array and their ids
 var DEBUG_SHOW_MAP_BOUNDS = true;
 
 // Constants for physics
-var PHYSICS_LOOP_HZ = 1.0 / 60.0; // 30 fps
-var PHYSICS_VELOCITY_ITERATIONS = 10;
-var PHYSICS_POSITION_ITERATIONS = 10;
+var PHYSICS_LOOP_HZ = 1.0 / 60.0;     // 60 Hz = 60 updates per second
+var PHYSICS_VELOCITY_ITERATIONS = 10; // # of iterations for velocity adjustment
+var PHYSICS_POSITION_ITERATIONS = 10; // # of iterations for overlap resolution
 
-// Constants for animations
-var DEFAULT_WALKING_SPEED = 100; // Box2D works in MKS, so this is actually 
+// NOTE: the term 'velocity' is used in box2d and throughout the current project
+// when referring to physic velocity or speed (in m/s). Besides, the term
+// 'speed' is used when referring to game/phycics/current-sprite update
+// frequency.
+
+// Constants for animations: they express how quickly the current frame/sprite
+// is updated. More specifically, # of sprites advanced every game update.
 var DEFAULT_ANIM_SPEED = 0.5;   // for humans & skeletons walking & attacking
 var DEATH_ANIM_SPEED = 0.25;    // for humans & skeletons dying
 var CHEST_ANIM_SPEED = 0.25;    // for treasure chest items
@@ -34,6 +39,9 @@ var SHOW_NAME_SKELETONS = true;
 var SHOW_LIFE_BAR_HUMANS = true;
 var SHOW_LIFE_BAR_SKELETONS = true;
 var SHOW_VALUE_ITEMS = true;
+
+// Other constants for game entities
+var DEFAULT_WALKING_VELOCITY = 100; // in m/s
 
 // Constants for map data loading
 var MAP_ASSETS_SUBFOLDER = 'graphics';  // Subfolder from root (folder with index.html)

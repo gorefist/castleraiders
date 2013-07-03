@@ -22,7 +22,7 @@ SoldierClass = EntityClass.extend({
     name: "Soldier 1", // it could be customized and displayed so that you can
     // have your custom army, and for skeletons it may be used for bosses, etc.
     drawName: true,
-    speed: DEFAULT_WALKING_SPEED,
+    speed: DEFAULT_WALKING_VELOCITY,
     inputInfo: null, //contains last input from keyboard and/or mouse
     // Here I'd add other features like shield, power attack, etc.
 
@@ -221,6 +221,10 @@ SoldierClass = EntityClass.extend({
         {
             if (otherEnt instanceof SoldierClass)
             {
+                // TO DO: add a physic body with .isSensor = true to the soldiers,
+                // bigger than the physic body itself, to allow attacking enemies
+                // without needing to touch them.
+                
                 // Check if it's an attack
                 if (this.currentState.action === 'attack' &&
                         (OPTIONS_FRIENDLY_FIRE || otherEnt.soldierType != this.soldierType) &&
