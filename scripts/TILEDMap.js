@@ -235,7 +235,8 @@ var TILEDMapClass = Class.extend({
         for (var layerIdx = 0; layerIdx < gMap.currMapData.layers.length; layerIdx++) {
             // Check if the 'type' of the layer is "tilelayer". If it isn't, we don't
             // care about drawing it...
-            if (gMap.currMapData.layers[layerIdx].type != "tilelayer")
+            if (gMap.currMapData.layers[layerIdx].type != "tilelayer"
+                    || !gMap.currMapData.layers[layerIdx].visible) // [Sergio D. Jubera] don't draw if it's hidden
                 continue;
 
             // ...Grab the 'data' Array of the given layer...
@@ -291,6 +292,31 @@ var TILEDMapClass = Class.extend({
     },
     height: function() {
         return this.numYTiles * this.tileSize.y;
+    },
+    readMetadata: function() {
+        // [Sergio D. Jubera]
+        // Now we need to read layers of a special type, 'objectgroup', used
+        // for collisions, entity spawn, etc.
+        for (var layerIdx = 0; layerIdx < gMap.currMapData.layers.length; layerIdx++) {
+            var lyr = gMap.currMapData.layers[layerIdx];
+            if (lyr.type == "objectgroup")
+            {
+                if (lyr.name == 'collisions') {
+                    // walls and static objects (trees, rocks, etc.)
+                    for (var i = 0; i < lyr.objects.length; i++) {
+                        var obj = lyr.objects[i];
+                        var ent = new EntityClass({ x: obj.x + obj.width*0.5, y: obj.y + obj.height*0.5 },{ w: obj.width, h: obj.height });
+                        ent.setUpPhysics('static');
+                    }
+                }
+                else if (lyr.name == 'soldiers') {
+
+                }
+                else if (lyr.name == 'items') {
+
+                }
+            }
+        }
     }
 });
 

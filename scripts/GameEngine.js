@@ -16,7 +16,7 @@ var GAME_LOOP_MS = 1000.0 / 60.0;   // # of milliseconds between scene drawings
 // Constants for physics
 var PIXEL_METER_SCALE = 1.0;          // ratio for pixel-meter conversion. Default is 1.0 (1m : 50px).
 var GAME_LOOP_HZ = 1.0 / 60.0;     // 60 Hz = 60 updates per second
-var PHYSICS_VELOCITY_ITERATIONS = 10; // # of iterations for velocity adjustment
+var PHYSICS_VELOCITY_ITERATIONS = 20; // # of iterations for velocity adjustment
 var PHYSICS_POSITION_ITERATIONS = 10; // # of iterations for overlap resolution
 
 // NOTE: the term 'velocity' is used in box2d and throughout the current project
@@ -109,8 +109,8 @@ GameEngineClass = Class.extend({
                 }
             }
         });
-        // TO DO: read map settings file (.json) to know what objects to create,
-        // rather than hardcoding it:
+        
+        gMap.readMetadata();
 
         // Enemies (skeletons)
         gGameEngine.spawnSoldier('soldier', {x: 100, y: 100}, {w: 26, h: 30}, 'skeleton', 'Skeleton A');
@@ -330,8 +330,10 @@ GameEngineClass = Class.extend({
         orderedEntities.sort(compareVerticalPosition);
         for (var i = 0; i < orderedEntities.length; i++)
             orderedEntities[i].draw();
+        gPhysicsEngine.drawBodies();
         ctx.restore();
-        gGameEngine._drawDebugInfo();
+        
+        gGameEngine._drawDebugInfo();        
     },
     // [Sergio D. Jubera]
     // Used to change user's control to next soldier

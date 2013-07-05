@@ -138,8 +138,7 @@ SoldierClass = EntityClass.extend({
         this.animations[this.currentState.action + "_" + this.currentState.dir].draw(this.pos.x, this.pos.y);
         this.animate();
 
-        this.drawPhysicBody(); // for debug
-        this.drawEntityId(this.soldierType);
+        this.drawEntityId(this.soldierType); // for debug
     },
     // The following methods modify soldier state for animation purposes
     _stop: function()

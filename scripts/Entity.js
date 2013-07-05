@@ -39,42 +39,6 @@ EntityClass = Class.extend({
         // with the constructed entityDef.
         this.physBody = gPhysicsEngine.addBody(entityDef);
     },
-    drawPhysicBody: function()
-    {
-        if (DEBUG_SHOW_PHYSIC_BODIES)
-        {
-            var physPos = {
-                x: toPixels(this.physBody.GetPosition().x),
-                y: toPixels(this.physBody.GetPosition().y)
-            };
-
-            // Draw physic body (for debug)
-            ctx.beginPath();
-            ctx.rect(
-                    physPos.x - (this.size.w * 0.5),
-                    physPos.y - (this.size.h * 0.5),
-                    this.size.w,
-                    this.size.h);
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = 'red';
-            ctx.stroke();
-
-            // Draw physic body type (for debug)
-            var textToDisplay = "type=" + (this.physBody.GetType() === Body.b2_staticBody ? 'static' : this.physBody.GetType() === Body.b2_dynamicBody ? 'dynamic' : 'unknown body type');
-            //textToDisplay += ", linear damping=" + this.physBody.GetDefinition().linearDamping;
-            var fixture = this.physBody.GetFixtureList();
-            //textToDisplay += ",density=" + fixture.GetDensity() + ",friction=" + fixture.GetFriction() + ",restitution=" + fixture.GetRestitution() + ",mass=" + fixture.GetMassData().mass;
-            textToDisplay += ",allowSleep=" + this.physBody.GetDefinition().allowSleep;
-            font = " bold 10px sans-serif";
-            ctx.textAlign = "left";
-            ctx.textBaseline = "middle";
-            ctx.fillStyle = "#ff0000";
-            ctx.fillText(
-                    textToDisplay,
-                    physPos.x + (this.size.w * 0.5),
-                    physPos.y + (this.size.h * 0.5));
-        }
-    },
     drawEntityId: function(entityType)
     {
         if (DEBUG_SHOW_ENTITIES)

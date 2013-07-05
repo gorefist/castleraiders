@@ -59,9 +59,9 @@ ChestItemClass = EntityClass.extend({
         }
 
         this.animation.draw(this.pos.x, this.pos.y + CHEST_ANIM_OFFSET.y);
-        this.drawPhysicBody();
+        
         this.animation.animate();
-        this.drawEntityId('chest');
+        this.drawEntityId('chest'); // for debug
     },      
     itemEffects: function(targetEnt)
     {

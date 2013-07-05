@@ -58,9 +58,9 @@ HeartItemClass = EntityClass.extend({
         }
 
         this.animation.draw(this.pos.x, this.pos.y + HEART_ANIM_OFFSET.y);
-        this.drawPhysicBody();
+        
         this.animation.animate();
-        this.drawEntityId('heart');
+        this.drawEntityId('heart'); // for debug
     },
     itemEffects: function(targetEnt)
     {

@@ -18,10 +18,8 @@ PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
 CircleShape = Box2D.Collision.Shapes.b2CircleShape;
 DebugDraw = Box2D.Dynamics.b2DebugDraw;
 RevoluteJointDef = Box2D.Dynamics.Joints.b2RevoluteJointDef;
-
 PhysicsEngineClass = Class.extend({
     world: null,
-
     //-----------------------------------------
     create: function() {
         gPhysicsEngine.world = new World(
@@ -32,27 +30,23 @@ PhysicsEngineClass = Class.extend({
     //-----------------------------------------
     update: function() {
         var start = Date.now();
-
         gPhysicsEngine.world.Step(
                 GAME_LOOP_HZ, //frame-rate
                 PHYSICS_VELOCITY_ITERATIONS, //velocity iterations
                 PHYSICS_POSITION_ITERATIONS  //position iterations
                 );
         gPhysicsEngine.world.ClearForces();
-
         return(Date.now() - start);
     },
     //-----------------------------------------
     addContactListener: function(callbacks) {
         var listener = new Box2D.Dynamics.b2ContactListener();
-
         if (callbacks.PostSolve)
             listener.PostSolve = function(contact, impulse) {
                 callbacks.PostSolve(contact.GetFixtureA().GetBody(),
                         contact.GetFixtureB().GetBody(),
                         impulse.normalImpulses[0]);
             };
-
         gPhysicsEngine.world.SetContactListener(listener);
     },
     //-----------------------------------------
@@ -63,8 +57,7 @@ PhysicsEngineClass = Class.extend({
     //-----------------------------------------
     addBody: function(entityDef) {
         var bodyDef = new BodyDef();
-
-        bodyDef.userData = entityDef.userData;    // application specific body
+        bodyDef.userData = entityDef.userData; // application specific body
         // data, here it's used to store the id (for debug and attack handling)
         // and the entity object which owns this specific body (for collision
         // handling)
@@ -72,11 +65,10 @@ PhysicsEngineClass = Class.extend({
         bodyDef.position.x = toMeters(entityDef.x);
         bodyDef.position.y = toMeters(entityDef.y);
         //bodyDef.allowSleep = false;
-        if (entityDef.damping) bodyDef.linearDamping = entityDef.damping;
-        
+        if (entityDef.damping)
+            bodyDef.linearDamping = entityDef.damping;
         var body = gPhysicsEngine.registerBody(bodyDef);
         var fixtureDefinition = new FixtureDef();
-
         if (entityDef.useBouncyFixture) {
             fixtureDefinition.density = 1.0;
             fixtureDefinition.friction = 0;
@@ -88,19 +80,66 @@ PhysicsEngineClass = Class.extend({
             fixtureDefinition.restitution = 1.0;
         }
 
-        // Now we define the shape of this object as a box
+// Now we define the shape of this object as a box
         fixtureDefinition.shape = new PolygonShape();
         fixtureDefinition.shape.SetAsBox(toMeters(entityDef.halfWidth), toMeters(entityDef.halfHeight));
         body.CreateFixture(fixtureDefinition);
-
         return body;
     },
     //-----------------------------------------
     removeBody: function(obj) {
         gPhysicsEngine.world.DestroyBody(obj);
         console.log("body destroyed");
+    },
+    drawBodies: function() {
+        if (DEBUG_SHOW_PHYSIC_BODIES)
+        {
+            var physBody = this.world.GetBodyList();
+            while (physBody != null) {
+
+                var physPos = {
+                    x: toPixels(physBody.GetPosition().x),
+                    y: toPixels(physBody.GetPosition().y)
+                };
+
+                var fixture = physBody.GetFixtureList();
+
+                if (fixture != null) {
+
+                    var physBounds = {
+                        lowerBound: fixture.GetAABB().lowerBound,
+                        upperBound: fixture.GetAABB().upperBound
+                    };
+
+                    // Draw physic body (for debug)
+                    ctx.beginPath();
+                    ctx.rect(
+                            toPixels(physBounds.lowerBound.x),
+                            toPixels(physBounds.lowerBound.y),
+                            toPixels(physBounds.upperBound.x - physBounds.lowerBound.x),
+                            toPixels(physBounds.upperBound.y - physBounds.lowerBound.y)
+                            );
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = 'red';
+                    ctx.stroke();
+                    // Draw physic body type (for debug)
+                    var textToDisplay = "type=" + (physBody.GetType() === Body.b2_staticBody ? 'static' : physBody.GetType() === Body.b2_dynamicBody ? 'dynamic' : 'unknown body type');
+                    //textToDisplay += ", linear damping=" + physBody.GetDefinition().linearDamping;
+
+                    //textToDisplay += ",density=" + fixture.GetDensity() + ",friction=" + fixture.GetFriction() + ",restitution=" + fixture.GetRestitution() + ",mass=" + fixture.GetMassData().mass;
+                    textToDisplay += ",allowSleep=" + physBody.GetDefinition().allowSleep;
+                    font = " bold 10px sans-serif";
+                    ctx.textAlign = "left";
+                    ctx.textBaseline = "middle";
+                    ctx.fillStyle = "#ff0000";
+                    ctx.fillText(
+                            textToDisplay,
+                            toPixels(physBounds.upperBound.x),
+                            toPixels(physBounds.upperBound.y));
+                }
+                physBody = physBody.GetNext();
+            }
+        }
     }
-
 });
-
 var gPhysicsEngine = new PhysicsEngineClass();
