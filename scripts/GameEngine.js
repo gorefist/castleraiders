@@ -319,21 +319,27 @@ GameEngineClass = Class.extend({
         var trV = gGameEngine.calculateViewPointTranslation();
         ctx.translate(trV.x, trV.y);
 
-        // Draw the map
-        gMap.draw(ctx);
-        gGameEngine._drawWorldBounds(); // for debug
-
+        // Draw map (partially)
+        gMap.drawBackground(ctx);
+        
         // Draw cursor for current soldier
         gGameEngine._drawPointer();
+        
         // Draw entities ordered by pos.y, to make the pseudo-3D effect
         var orderedEntities = gGameEngine.entities.slice(); //shallow copy
         orderedEntities.sort(compareVerticalPosition);
         for (var i = 0; i < orderedEntities.length; i++)
             orderedEntities[i].draw();
-        gPhysicsEngine.drawBodies();
+        
+        // Draw the rest of the map
+        gMap.drawElements(ctx);
+        gMap.drawForeground(ctx);
+        
+        gGameEngine._drawWorldBounds(); // for debug
+        gPhysicsEngine.drawBodies();    // for debug
         ctx.restore();
         
-        gGameEngine._drawDebugInfo();        
+        gGameEngine._drawDebugInfo();   // for debug
     },
     // [Sergio D. Jubera]
     // Used to change user's control to next soldier

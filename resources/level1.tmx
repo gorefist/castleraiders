@@ -10,20 +10,50 @@
  </layer>
  <layer name="wallsAndObjects" width="70" height="70">
   <data encoding="base64" compression="zlib">
-   eJztmjtTwzAMx81rgPBmgJZXGKAtK0NZGBjKV2OAlQFWBljhDj4f4qB3rk5OYtdWrFa/u/81Sf3IKbKj2Fo1xqyB1i0V6LhAxwVRvqip27Q8vobrbIA2TXr2QQegLqiDhK81Oe/WlOs66nZq6o5/D0FHSSwxyTnoAtQH9Ry/feu8h86r/nO1h8va16ra/NUAdJnEEpNcMfQRm2uGPm4Z+oiN2oWGwy46jmgk+ssdQx8S7aL+QqPzC42OIxoOu0jzlwfQI0M/0uzyDHph6EfaOHoDvTP0I80uX6Bvhn6kjSMu1C400sYRF+ovNOovNNL8hWvdW5q/cK17S/MXXfd2o+svNLrOQKPrUjQ6jmjULjQh88syaMWj/DzYZQjaBe151JFoF99xNAKVoDOPOhLtouveNDrv0nD4y72h88SqcsZwjhdV15VL5sohq2oDl+HYJ3ky1flj+NglnzyyunpUGbsdjn2SV0PnjOEcr6rcMSoHzKctnHNG5aDZ/6XYJ1kALYKW/s8/QJ8J+klFqn2SLdA2aCdB25I5Bp2ATtu+EUVRRDNs+wYyZdT2DSiKIHAMq/yRKoaVbu9UMax+M9DoN4NcfMa6716JZHzGuu9eiWR8xnpp/PZKxsTws5sp6+dIiJ/Noh0wpQnzM2nk8iztd4b0WDEm9jsjJFbM5fnGxn5nzEusOE+xkg+5xUqh81fs51uavN5hod+6uT3f2ITOX6Vp9nxn9R2gzBbTxH3T+ngbMWfTvaw21wjb6LvpXlabcZ/d9w9pwT1G
+   eJztmr1OwzAQx71CAHWDFoTCAC2sfIiFgY/yEMDM1yvwAAywIgQrQrCCgAfgybgIVUpP58ROnLPj3k/6q0lq+9Lr2XHsm1JKTYNmckrQcYKOE6J8UlLXtDy+huvMguZU88yDFkA9UBcJXzM575WU62nqdkvqjj4XQUuNeGKcVdAaaADqaz4HufM+Oi/6TtceLpu/VtRmpnXQRiOeGGeTwYZrdhls7DPYcI34hYbDL9KPaNoYL8cMNtrol9jiZQu0Ddqp2U5s48sB6BB0VLOdkPvRFzp/rHsjFnD4pWq8/IJOQDegM9Crszsq5g50z2Cnql+yeMn8cqr+/cIVL0+gZwY7VftRlXi5BF2BrivazHgDvdeob0qd55GL32nLN+iHwU4b57sciF9oQpjvnoMufN8EQuKFJoR4CREX8eLqvccErnVvF/Hi6r3HBK51b87xxUVcxbju7SquYlt/cUXI6ww+iW1dyhXSj2jELzQyvtCIX2hs+9EQlIJWLOq00S8hr3v7RMZdGo54uVV0nlhRzhjO8aLq6nLJdDlkRW3gMhz7JA+qOH8MH+tkk0dWVo8qk2+HY5/kRdE5YzjHqyh3jMoBs2kL55xROWj57zj2ST5Anwx2XNHkPkmnoXbbzrLvGxAEQYiUoe8bEAQhCmQOS9PUHFb8TSPvDEJsSF+nMe3rqbLbK3HJnie7oTEJfkiVvzjjZBL+y7bT0RybEPP/u6w5FgQhzGeYzH9pqoxfqTL7f2N+BghCRuwx7nPc5LZts5flc943sv0HkHpImw==
   </data>
  </layer>
- <layer name="foreground" width="70" height="70" visible="0">
+ <layer name="foreground" width="70" height="70">
   <data encoding="base64" compression="zlib">
-   eJztwQEBAAAAgiD/r25IQAEAAAAAAAAAAAAAAAAAAAAAAACvBkyQAAE=
+   eJzt2UsOgjAQAFD8rY26Nh6DS6j3P45dkMiCGCDgtPS9ZNJlJ9B2pmnTAAAAjPdM8Urxjk6ETbK+AAAAALbrmOIUnURm2hTXFLfoRACAWXYp9ikO0Ylk5tyNl9As8nPvxkdoFkDp2ugEgOLpYYet1cOW/r3X6mHdGYa5M5Rryl6v6a1kyl6v6a3kH3u9pnU2RU3rjHz1a0bpveKS+jVDr/jVrxm19Ipq2LDcatjc82vr/3fu+ZXb/11aLecX/BLZ90XMPfYtK7Lvy7nnjDw3+3N/API/Bsw=
   </data>
  </layer>
  <objectgroup name="collisions" width="70" height="70">
   <object name="rock" x="641" y="2241" width="38" height="37"/>
   <object name="rock" x="801" y="2203" width="38" height="37"/>
   <object name="rock" x="241" y="2601" width="38" height="37"/>
-  <object name="wall" x="1802" y="920" width="37" height="599"/>
+  <object name="wall" x="1802" y="920" width="25" height="597"/>
   <object name="wall" x="1" y="1481" width="1812" height="37"/>
+  <object name="rock" x="2040" y="2682" width="38" height="37"/>
+  <object name="rock" x="1641" y="2363" width="38" height="37"/>
+  <object name="rock" x="2440" y="2281" width="38" height="37"/>
+  <object name="rock" x="2282" y="1242" width="33" height="28"/>
+  <object name="wall" x="2" y="83" width="1812" height="37"/>
+  <object name="wall" x="1801" y="1" width="28" height="599"/>
+  <object name="wall" x="1" y="84" width="37" height="1422"/>
+  <object name="tree" x="2328" y="1215" width="63" height="56"/>
+  <object name="tree2" x="321" y="2000" width="38" height="69"/>
+  <object name="tree2" x="1161" y="2361" width="38" height="68"/>
+  <object name="tree2" x="1041" y="2361" width="38" height="68"/>
+  <object name="tree2" x="2121" y="2520" width="37" height="68"/>
+  <object name="tree2" x="2722" y="2721" width="38" height="68"/>
+  <object name="tree2" x="2682" y="1521" width="38" height="68"/>
+  <object name="tree2" x="2241" y="1921" width="38" height="68"/>
+  <object name="tree2" x="1961" y="2121" width="38" height="69"/>
+  <object name="tree2" x="1481" y="2720" width="38" height="69"/>
+  <object name="bench" x="1322" y="722" width="78" height="37"/>
+  <object name="chair" x="561" y="481" width="39" height="38"/>
+  <object name="chair" x="721" y="481" width="39" height="38"/>
+  <object name="chair" x="561" y="561" width="39" height="38"/>
+  <object name="chair" x="720" y="561" width="39" height="38"/>
+  <object name="table" x="602" y="480" width="117" height="158"/>
+  <object name="table-mini" x="1081" y="561" width="118" height="37"/>
+  <object name="tree" x="2368" y="2137" width="63" height="56"/>
+  <object name="tree" x="648" y="2498" width="63" height="56"/>
+  <object name="tree" x="129" y="2256" width="63" height="56"/>
+  <object name="tree" x="2647" y="2535" width="63" height="56"/>
+  <object name="rock" x="2444" y="1761" width="33" height="28"/>
+  <object name="rock" x="1043" y="2762" width="33" height="28"/>
  </objectgroup>
  <objectgroup name="soldiers" width="70" height="70" visible="0"/>
 </map>

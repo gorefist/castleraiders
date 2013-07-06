@@ -49,6 +49,9 @@ var TILEDMapClass = Class.extend({
     // Boolean flag we set once our tile images
     // has finished loading.
     fullyLoaded: false,
+    foregroundLayer: null, // [Sergio D. Jubera] This layer is special, it must
+    // be drawn apart from the other layers.
+    backgroundLayer: null, // [Sergio D. Jubera] The same for the background.
     //-----------------------------------------
     // Load the json file at the url 'map' into
     // memory. This is similar to the requests
@@ -224,7 +227,7 @@ var TILEDMapClass = Class.extend({
     //-----------------------------------------
     // Draws all of the map data to the passed-in
     // canvas context, 'ctx'.
-    draw: function(ctx) {
+    drawElements: function(ctx) {
         // First, we need to check if the map data has
         // already finished loading...
         if (!gMap.fullyLoaded)
@@ -235,57 +238,36 @@ var TILEDMapClass = Class.extend({
         for (var layerIdx = 0; layerIdx < gMap.currMapData.layers.length; layerIdx++) {
             // Check if the 'type' of the layer is "tilelayer". If it isn't, we don't
             // care about drawing it...
-            if (gMap.currMapData.layers[layerIdx].type != "tilelayer"
+            if (gMap.currMapData.layers[layerIdx].type !== "tilelayer"
                     || !gMap.currMapData.layers[layerIdx].visible) // [Sergio D. Jubera] don't draw if it's hidden
                 continue;
 
-            // ...Grab the 'data' Array of the given layer...
-            var dat = gMap.currMapData.layers[layerIdx].data;
-
-            // ...For each tileID in the 'data' Array...
-            for (var tileIDX = 0; tileIDX < dat.length; tileIDX++) {
-                // ...Check if that tileID is 0. Remember, we don't draw
-                // draw those, so we can skip processing them...
-                var tID = dat[tileIDX];
-                if (tID === 0)
-                    continue;
-
-                // ...If the tileID is not 0, then we grab the
-                // packet data using getTilePacket.
-                var tPKT = gMap.getTilePacket(tID);
-
-                // Now we need to calculate the (x,y) position we want to draw
-                // to in our game world.
-                //
-                // We've performed a similar calculation in 'getTilePacket',
-                // think about how to calculate this based on the tile id and
-                // various tile properties that our TILEDMapClass has.
-                //
-                var worldX = Math.floor(tileIDX % gMap.numXTiles) * gMap.tileSize.x;
-                var worldY = Math.floor(tileIDX / gMap.numXTiles) * gMap.tileSize.y;
-
-
-                // Now, we're finally drawing the map to our canvas! The 'drawImage'
-                // method of our 'ctx' object takes nine arguments:
-                //
-                // 1) The Image object to draw,
-                // 2) The source x coordinate in our Image,
-                // 3) The source y coordinate in our Image,
-                // 4) The source width of our tile,
-                // 5) The source height of our tile,
-                // 6) The canvas x coordinate to draw to,
-                // 7) The canvas y coordinate to draw to,
-                // 8) The destination width,
-                // 9) The destination height
-                //
-                // Note that we don't want to stretch our tiles at all, so the
-                // source height and width should be the same as the destination!
-                //
-
-                ctx.drawImage(tPKT.img, tPKT.px, tPKT.py, gMap.tileSize.x, gMap.tileSize.y, worldX, worldY, gMap.tileSize.x, gMap.tileSize.y);
-
+            // [Sergio D. Jubera] foreground layer must be drawn separately:
+            if (gMap.currMapData.layers[layerIdx].name === 'foreground') {
+                gMap.foregroundLayer = gMap.currMapData.layers[layerIdx];
+                continue;
             }
+
+            // [Sergio D. Jubera] the same for the background:
+            if (gMap.currMapData.layers[layerIdx].name === 'background') {
+                gMap.backgroundLayer = gMap.currMapData.layers[layerIdx];
+                continue;
+            }
+
+            this._drawLayer(gMap.currMapData.layers[layerIdx].data);
         }
+    },
+    drawForeground: function(ctx) {
+        if (!this.fullyLoaded || this.foregroundLayer === null)
+            return;
+
+        this._drawLayer(this.foregroundLayer.data);
+    },
+    drawBackground: function(ctx) {
+        if (!this.fullyLoaded || this.backgroundLayer === null)
+            return;
+
+        this._drawLayer(this.backgroundLayer.data);
     },
     width: function() {
         return this.numXTiles * this.tileSize.x;
@@ -305,7 +287,7 @@ var TILEDMapClass = Class.extend({
                     // walls and static objects (trees, rocks, etc.)
                     for (var i = 0; i < lyr.objects.length; i++) {
                         var obj = lyr.objects[i];
-                        var ent = new EntityClass({ x: obj.x + obj.width*0.5, y: obj.y + obj.height*0.5 },{ w: obj.width, h: obj.height });
+                        var ent = new EntityClass({x: obj.x + obj.width * 0.5, y: obj.y + obj.height * 0.5}, {w: obj.width, h: obj.height});
                         ent.setUpPhysics('static');
                     }
                 }
@@ -316,6 +298,50 @@ var TILEDMapClass = Class.extend({
 
                 }
             }
+        }
+    },
+    _drawLayer: function(layerData) {
+        // ...For each tileID in the 'data' Array...
+        for (var tileIDX = 0; tileIDX < layerData.length; tileIDX++) {
+            // ...Check if that tileID is 0. Remember, we don't draw
+            // draw those, so we can skip processing them...
+            var tID = layerData[tileIDX];
+            if (tID === 0)
+                continue;
+
+            // ...If the tileID is not 0, then we grab the
+            // packet data using getTilePacket.
+            var tPKT = gMap.getTilePacket(tID);
+
+            // Now we need to calculate the (x,y) position we want to draw
+            // to in our game world.
+            //
+            // We've performed a similar calculation in 'getTilePacket',
+            // think about how to calculate this based on the tile id and
+            // various tile properties that our TILEDMapClass has.
+            //
+            var worldX = Math.floor(tileIDX % gMap.numXTiles) * gMap.tileSize.x;
+            var worldY = Math.floor(tileIDX / gMap.numXTiles) * gMap.tileSize.y;
+
+
+            // Now, we're finally drawing the map to our canvas! The 'drawImage'
+            // method of our 'ctx' object takes nine arguments:
+            //
+            // 1) The Image object to draw,
+            // 2) The source x coordinate in our Image,
+            // 3) The source y coordinate in our Image,
+            // 4) The source width of our tile,
+            // 5) The source height of our tile,
+            // 6) The canvas x coordinate to draw to,
+            // 7) The canvas y coordinate to draw to,
+            // 8) The destination width,
+            // 9) The destination height
+            //
+            // Note that we don't want to stretch our tiles at all, so the
+            // source height and width should be the same as the destination!
+            //
+
+            ctx.drawImage(tPKT.img, tPKT.px, tPKT.py, gMap.tileSize.x, gMap.tileSize.y, worldX, worldY, gMap.tileSize.x, gMap.tileSize.y);
         }
     }
 });
