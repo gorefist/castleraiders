@@ -29,18 +29,10 @@
   <object name="rock" x="2440" y="2281" width="38" height="37"/>
   <object name="rock" x="2282" y="1242" width="33" height="28"/>
   <object name="wall" x="2" y="83" width="1812" height="37"/>
-  <object name="wall" x="1801" y="1" width="28" height="599"/>
+  <object name="wall" x="1800" y="83" width="28" height="519"/>
   <object name="wall" x="1" y="84" width="37" height="1422"/>
   <object name="tree" x="2328" y="1215" width="63" height="56"/>
-  <object name="tree2" x="321" y="2000" width="38" height="69"/>
-  <object name="tree2" x="1161" y="2361" width="38" height="68"/>
-  <object name="tree2" x="1041" y="2361" width="38" height="68"/>
-  <object name="tree2" x="2121" y="2520" width="37" height="68"/>
-  <object name="tree2" x="2722" y="2721" width="38" height="68"/>
-  <object name="tree2" x="2682" y="1521" width="38" height="68"/>
-  <object name="tree2" x="2241" y="1921" width="38" height="68"/>
-  <object name="tree2" x="1961" y="2121" width="38" height="69"/>
-  <object name="tree2" x="1481" y="2720" width="38" height="69"/>
+  <object name="tree2" x="2680" y="1548" width="37" height="38"/>
   <object name="bench" x="1322" y="722" width="78" height="37"/>
   <object name="chair" x="561" y="481" width="39" height="38"/>
   <object name="chair" x="721" y="481" width="39" height="38"/>
@@ -54,6 +46,93 @@
   <object name="tree" x="2647" y="2535" width="63" height="56"/>
   <object name="rock" x="2444" y="1761" width="33" height="28"/>
   <object name="rock" x="1043" y="2762" width="33" height="28"/>
+  <object name="tree2" x="1479" y="2749" width="37" height="38"/>
+  <object name="tree2" x="1039" y="2389" width="37" height="38"/>
+  <object name="tree2" x="1161" y="2391" width="37" height="38"/>
+  <object name="tree2" x="2121" y="2551" width="37" height="38"/>
+  <object name="tree2" x="2721" y="2750" width="37" height="38"/>
+  <object name="tree2" x="2239" y="1949" width="37" height="38"/>
+  <object name="tree2" x="1959" y="2148" width="37" height="38"/>
+  <object name="tree2" x="321" y="2030" width="37" height="38"/>
  </objectgroup>
- <objectgroup name="soldiers" width="70" height="70" visible="0"/>
+ <objectgroup name="spawn" width="70" height="70">
+  <object name="soldier" type="skeleton" x="1841" y="600" width="39" height="39">
+   <properties>
+    <property name="faceAngle" value="right"/>
+   </properties>
+  </object>
+  <object name="chest" x="162" y="121" width="39" height="39">
+   <properties>
+    <property name="coins" value="250"/>
+   </properties>
+  </object>
+  <object name="heart" x="2280" y="1161" width="39" height="39">
+   <properties>
+    <property name="hitPoints" value="15"/>
+   </properties>
+  </object>
+  <object name="soldier" type="human" x="2321" y="2361" width="39" height="39">
+   <properties>
+    <property name="faceAngle" value="down"/>
+    <property name="maxHP" value="200"/>
+    <property name="name" value="Lord Sergio"/>
+   </properties>
+  </object>
+  <object name="soldier" type="skeleton" x="1840" y="841" width="39" height="39">
+   <properties>
+    <property name="faceAngle" value="right"/>
+   </properties>
+  </object>
+  <object name="soldier" type="skeleton" x="121" y="202" width="39" height="39">
+   <properties>
+    <property name="faceAngle" value="down"/>
+    <property name="name" value="Skull Boss"/>
+   </properties>
+  </object>
+  <object name="soldier" type="human" x="2281" y="2441" width="39" height="39">
+   <properties>
+    <property name="faceAngle" value="up"/>
+   </properties>
+  </object>
+  <object name="soldier" type="human" x="2361" y="2442" width="39" height="39">
+   <properties>
+    <property name="faceAngle" value="up"/>
+   </properties>
+  </object>
+  <object name="soldier" type="human" x="2321" y="2520" width="39" height="39">
+   <properties>
+    <property name="faceAngle" value="up"/>
+   </properties>
+  </object>
+  <object name="soldier" type="human" x="2242" y="2522" width="39" height="39">
+   <properties>
+    <property name="faceAngle" value="up"/>
+   </properties>
+  </object>
+  <object name="soldier" type="human" x="2402" y="2521" width="39" height="39">
+   <properties>
+    <property name="faceAngle" value="up"/>
+   </properties>
+  </object>
+  <object name="soldier" type="human" x="2281" y="2602" width="39" height="39">
+   <properties>
+    <property name="faceAngle" value="up"/>
+   </properties>
+  </object>
+  <object name="soldier" type="human" x="2200" y="2600" width="39" height="39">
+   <properties>
+    <property name="faceAngle" value="up"/>
+   </properties>
+  </object>
+  <object name="soldier" type="human" x="2361" y="2601" width="39" height="39">
+   <properties>
+    <property name="faceAngle" value="up"/>
+   </properties>
+  </object>
+  <object name="soldier" type="human" x="2442" y="2602" width="39" height="39">
+   <properties>
+    <property name="faceAngle" value="up"/>
+   </properties>
+  </object>
+ </objectgroup>
 </map>

@@ -291,14 +291,42 @@ var TILEDMapClass = Class.extend({
                         ent.setUpPhysics('static');
                     }
                 }
-                else if (lyr.name == 'soldiers') {
+                else if (lyr.name == 'spawn') {
+                    // Entities spawn coordinates (width & height are ignored)
+                    for (var i = 0; i < lyr.objects.length; i++) {
+                        var obj = lyr.objects[i];
+//                        var ent = new EntityClass({x: obj.x + obj.width * 0.5, y: obj.y + obj.height * 0.5}, {w: obj.width, h: obj.height});
+//                        ent.setUpPhysics('static');
 
-                }
-                else if (lyr.name == 'items') {
+//                        gGameEngine.spawnSoldier('soldier', {x: 100, y: 100}, {w: 26, h: 30}, 'skeleton', 'Skeleton A');
+//                        gGameEngine.spawnSoldier('soldier', {x: 600, y: 400}, {w: 26, h: 30}, 'human', 'Sergio');
+//                        gGameEngine.spawnItem('heart', {x: 200, y: 200}, 30);
+//                        gGameEngine.spawnItem('chest', {x: 300, y: 300}, 230);
 
+
+
+                    }
                 }
             }
         }
+
+        // create map bounds
+        var boundsThickness = 100; // thickness (in px) for the phys bodies to limit the map
+        // Top
+        var ent = new EntityClass({x: this.width() / 2, y: 0 - boundsThickness * 0.5}, {w: this.width(), h: boundsThickness});
+        ent.setUpPhysics('static');
+
+        // Bottom
+        ent = new EntityClass({x: this.width() / 2, y: this.height() + boundsThickness * 0.5}, {w: this.width(), h: boundsThickness});
+        ent.setUpPhysics('static');
+
+        // Left
+        ent = new EntityClass({x: 0 - boundsThickness * 0.5, y: this.height() / 2}, {w: boundsThickness, h: this.height()});
+        ent.setUpPhysics('static');
+
+        // Right
+        ent = new EntityClass({x: this.width() + boundsThickness * 0.5, y: this.height() / 2}, {w: boundsThickness, h: this.height()});
+        ent.setUpPhysics('static');
     },
     _drawLayer: function(layerData) {
         // ...For each tileID in the 'data' Array...

@@ -168,7 +168,7 @@
                  "y":83
                 }, 
                 {
-                 "height":599,
+                 "height":519,
                  "name":"wall",
                  "properties":
                     {
@@ -177,8 +177,8 @@
                  "type":"",
                  "visible":true,
                  "width":28,
-                 "x":1801,
-                 "y":1
+                 "x":1800,
+                 "y":83
                 }, 
                 {
                  "height":1422,
@@ -207,46 +207,7 @@
                  "y":1215
                 }, 
                 {
-                 "height":69,
-                 "name":"tree2",
-                 "properties":
-                    {
-
-                    },
-                 "type":"",
-                 "visible":true,
-                 "width":38,
-                 "x":321,
-                 "y":2000
-                }, 
-                {
-                 "height":68,
-                 "name":"tree2",
-                 "properties":
-                    {
-
-                    },
-                 "type":"",
-                 "visible":true,
-                 "width":38,
-                 "x":1161,
-                 "y":2361
-                }, 
-                {
-                 "height":68,
-                 "name":"tree2",
-                 "properties":
-                    {
-
-                    },
-                 "type":"",
-                 "visible":true,
-                 "width":38,
-                 "x":1041,
-                 "y":2361
-                }, 
-                {
-                 "height":68,
+                 "height":38,
                  "name":"tree2",
                  "properties":
                     {
@@ -255,73 +216,8 @@
                  "type":"",
                  "visible":true,
                  "width":37,
-                 "x":2121,
-                 "y":2520
-                }, 
-                {
-                 "height":68,
-                 "name":"tree2",
-                 "properties":
-                    {
-
-                    },
-                 "type":"",
-                 "visible":true,
-                 "width":38,
-                 "x":2722,
-                 "y":2721
-                }, 
-                {
-                 "height":68,
-                 "name":"tree2",
-                 "properties":
-                    {
-
-                    },
-                 "type":"",
-                 "visible":true,
-                 "width":38,
-                 "x":2682,
-                 "y":1521
-                }, 
-                {
-                 "height":68,
-                 "name":"tree2",
-                 "properties":
-                    {
-
-                    },
-                 "type":"",
-                 "visible":true,
-                 "width":38,
-                 "x":2241,
-                 "y":1921
-                }, 
-                {
-                 "height":69,
-                 "name":"tree2",
-                 "properties":
-                    {
-
-                    },
-                 "type":"",
-                 "visible":true,
-                 "width":38,
-                 "x":1961,
-                 "y":2121
-                }, 
-                {
-                 "height":69,
-                 "name":"tree2",
-                 "properties":
-                    {
-
-                    },
-                 "type":"",
-                 "visible":true,
-                 "width":38,
-                 "x":1481,
-                 "y":2720
+                 "x":2680,
+                 "y":1548
                 }, 
                 {
                  "height":37,
@@ -491,6 +387,110 @@
                  "width":33,
                  "x":1043,
                  "y":2762
+                }, 
+                {
+                 "height":38,
+                 "name":"tree2",
+                 "properties":
+                    {
+
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":37,
+                 "x":1479,
+                 "y":2749
+                }, 
+                {
+                 "height":38,
+                 "name":"tree2",
+                 "properties":
+                    {
+
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":37,
+                 "x":1039,
+                 "y":2389
+                }, 
+                {
+                 "height":38,
+                 "name":"tree2",
+                 "properties":
+                    {
+
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":37,
+                 "x":1161,
+                 "y":2391
+                }, 
+                {
+                 "height":38,
+                 "name":"tree2",
+                 "properties":
+                    {
+
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":37,
+                 "x":2121,
+                 "y":2551
+                }, 
+                {
+                 "height":38,
+                 "name":"tree2",
+                 "properties":
+                    {
+
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":37,
+                 "x":2721,
+                 "y":2750
+                }, 
+                {
+                 "height":38,
+                 "name":"tree2",
+                 "properties":
+                    {
+
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":37,
+                 "x":2239,
+                 "y":1949
+                }, 
+                {
+                 "height":38,
+                 "name":"tree2",
+                 "properties":
+                    {
+
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":37,
+                 "x":1959,
+                 "y":2148
+                }, 
+                {
+                 "height":38,
+                 "name":"tree2",
+                 "properties":
+                    {
+
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":37,
+                 "x":321,
+                 "y":2030
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -501,11 +501,209 @@
         }, 
         {
          "height":70,
-         "name":"soldiers",
-         "objects":[],
+         "name":"spawn",
+         "objects":[
+                {
+                 "height":39,
+                 "name":"soldier",
+                 "properties":
+                    {
+                     "faceAngle":"right"
+                    },
+                 "type":"skeleton",
+                 "visible":true,
+                 "width":39,
+                 "x":1841,
+                 "y":600
+                }, 
+                {
+                 "height":39,
+                 "name":"chest",
+                 "properties":
+                    {
+                     "coins":"250"
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":39,
+                 "x":162,
+                 "y":121
+                }, 
+                {
+                 "height":39,
+                 "name":"heart",
+                 "properties":
+                    {
+                     "hitPoints":"15"
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":39,
+                 "x":2280,
+                 "y":1161
+                }, 
+                {
+                 "height":39,
+                 "name":"soldier",
+                 "properties":
+                    {
+                     "faceAngle":"down",
+                     "maxHP":"200",
+                     "name":"Lord Sergio"
+                    },
+                 "type":"human",
+                 "visible":true,
+                 "width":39,
+                 "x":2321,
+                 "y":2361
+                }, 
+                {
+                 "height":39,
+                 "name":"soldier",
+                 "properties":
+                    {
+                     "faceAngle":"right"
+                    },
+                 "type":"skeleton",
+                 "visible":true,
+                 "width":39,
+                 "x":1840,
+                 "y":841
+                }, 
+                {
+                 "height":39,
+                 "name":"soldier",
+                 "properties":
+                    {
+                     "faceAngle":"down",
+                     "name":"Skull Boss"
+                    },
+                 "type":"skeleton",
+                 "visible":true,
+                 "width":39,
+                 "x":121,
+                 "y":202
+                }, 
+                {
+                 "height":39,
+                 "name":"soldier",
+                 "properties":
+                    {
+                     "faceAngle":"up"
+                    },
+                 "type":"human",
+                 "visible":true,
+                 "width":39,
+                 "x":2281,
+                 "y":2441
+                }, 
+                {
+                 "height":39,
+                 "name":"soldier",
+                 "properties":
+                    {
+                     "faceAngle":"up"
+                    },
+                 "type":"human",
+                 "visible":true,
+                 "width":39,
+                 "x":2361,
+                 "y":2442
+                }, 
+                {
+                 "height":39,
+                 "name":"soldier",
+                 "properties":
+                    {
+                     "faceAngle":"up"
+                    },
+                 "type":"human",
+                 "visible":true,
+                 "width":39,
+                 "x":2321,
+                 "y":2520
+                }, 
+                {
+                 "height":39,
+                 "name":"soldier",
+                 "properties":
+                    {
+                     "faceAngle":"up"
+                    },
+                 "type":"human",
+                 "visible":true,
+                 "width":39,
+                 "x":2242,
+                 "y":2522
+                }, 
+                {
+                 "height":39,
+                 "name":"soldier",
+                 "properties":
+                    {
+                     "faceAngle":"up"
+                    },
+                 "type":"human",
+                 "visible":true,
+                 "width":39,
+                 "x":2402,
+                 "y":2521
+                }, 
+                {
+                 "height":39,
+                 "name":"soldier",
+                 "properties":
+                    {
+                     "faceAngle":"up"
+                    },
+                 "type":"human",
+                 "visible":true,
+                 "width":39,
+                 "x":2281,
+                 "y":2602
+                }, 
+                {
+                 "height":39,
+                 "name":"soldier",
+                 "properties":
+                    {
+                     "faceAngle":"up"
+                    },
+                 "type":"human",
+                 "visible":true,
+                 "width":39,
+                 "x":2200,
+                 "y":2600
+                }, 
+                {
+                 "height":39,
+                 "name":"soldier",
+                 "properties":
+                    {
+                     "faceAngle":"up"
+                    },
+                 "type":"human",
+                 "visible":true,
+                 "width":39,
+                 "x":2361,
+                 "y":2601
+                }, 
+                {
+                 "height":39,
+                 "name":"soldier",
+                 "properties":
+                    {
+                     "faceAngle":"up"
+                    },
+                 "type":"human",
+                 "visible":true,
+                 "width":39,
+                 "x":2442,
+                 "y":2602
+                }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":false,
+         "visible":true,
          "width":70,
          "x":0,
          "y":0

@@ -112,19 +112,6 @@ GameEngineClass = Class.extend({
         
         gMap.readMetadata();
 
-        // Enemies (skeletons)
-        gGameEngine.spawnSoldier('soldier', {x: 100, y: 100}, {w: 26, h: 30}, 'skeleton', 'Skeleton A');
-        gGameEngine.spawnSoldier('soldier', {x: 500, y: 500}, {w: 26, h: 30}, 'skeleton', 'Skeleton B');
-
-        // User's army (humans)
-        gGameEngine.spawnSoldier('soldier', {x: 600, y: 400}, {w: 26, h: 30}, 'human', 'Sergio');
-        gGameEngine.spawnSoldier('soldier', {x: 100, y: 500}, {w: 26, h: 30}, 'skeleton', 'Skeleton C');
-        gGameEngine.spawnSoldier('soldier', {x: 500, y: 100}, {w: 26, h: 30}, 'human', 'John Doe');
-
-        // Collectibles (hearts & chests)
-        gGameEngine.spawnItem('heart', {x: 200, y: 200}, 30);
-        gGameEngine.spawnItem('chest', {x: 300, y: 300}, 230);
-        gGameEngine.spawnItem('chest', {x: 400, y: 400}, 600);
         // Set user control to first human
         gGameEngine._currentSoldierIdx = 0;
         gGameEngine.nextSoldier();
@@ -321,6 +308,7 @@ GameEngineClass = Class.extend({
 
         // Draw map (partially)
         gMap.drawBackground(ctx);
+        gGameEngine._drawWorldBounds(); // for debug
         
         // Draw cursor for current soldier
         gGameEngine._drawPointer();
@@ -335,7 +323,6 @@ GameEngineClass = Class.extend({
         gMap.drawElements(ctx);
         gMap.drawForeground(ctx);
         
-        gGameEngine._drawWorldBounds(); // for debug
         gPhysicsEngine.drawBodies();    // for debug
         ctx.restore();
         
@@ -371,6 +358,7 @@ GameEngineClass = Class.extend({
     // current soldier (under user's control).
     calculateViewPointTranslation: function()
     {
+        // TO DO: check if canvas size is greater than map size
         var translation = new Vec2(
                 canvas.width / 2 - gGameEngine.currentSoldier().pos.x,
                 canvas.height / 2 - gGameEngine.currentSoldier().pos.y);
@@ -434,7 +422,7 @@ GameEngineClass = Class.extend({
 
 //    ctx.fillText("Mouse: (" + gInputEngine.mouse.x + "," + gInputEngine.mouse.y + ")", 10, 10);
 //    ctx.fillText("Player: (" + gGameEngine.currentSoldier().pos.x + "," + gGameEngine.currentSoldier().pos.y + ")", 10, 20);
-//    ctx.fillText("Transl: (" + gGameEngine.translateViewPoint().x + "," + gGameEngine.translateViewPoint().y + ")", 10, 30);
+//    ctx.fillText("Transl: (" + gGameEngine.calculateViewPointTranslation().x + "," + gGameEngine.calculateViewPointTranslation().y + ")", 10, 30);
 //    ctx.fillText("Map bounds: (" + gMap.width() + "," + gMap.height() + ")", 10, 40);
 //    ctx.fillText("Canvas bounds: (" + canvas.width + "," + canvas.height + ")", 10, 50);
     },
