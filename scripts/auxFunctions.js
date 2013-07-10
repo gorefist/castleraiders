@@ -21,8 +21,7 @@ function xhrGet(reqUri, callback, type) {
 }
 
 //Draws an oval. If scaleX = scaleY, then it'll be a circle.
-function drawOval(context, centerX, centerY, scaleX, scaleY, radius)
-{
+function drawOval(context, centerX, centerY, scaleX, scaleY, radius) {
     // save state
     context.save();
 
@@ -66,9 +65,19 @@ function compareVerticalPosition(entA, entB)
 // This is based on lesson "Input", chapter "Quantize" of the Udacity course.
 // 'vector' is the vector which angle is being quantized, and 'sectors' is the
 // number of discrete sectors to use.
-function quantizeAngle(vector, sectors)
-{
+function quantizeAngle(vector, sectors) {
     return (Math.round(Math.atan2(vector.y, vector.x) / (2 * Math.PI) * sectors) + sectors) % sectors;
+}
+
+function faceAngleToString(angle) {
+    if (angle < 1)
+        return 'right';
+    else if (angle < 2)
+        return 'down';
+    else if (angle < 3)
+        return 'left';
+    else
+        return 'up';
 }
 
 // Converts value from meters to pixels. The 'scale' parameter indicates the

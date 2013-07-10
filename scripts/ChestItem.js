@@ -12,7 +12,8 @@ ChestItemClass = EntityClass.extend({
     {
         this.parent(pos, value > 500 ? CHEST_SIZE : CHEST_SIZE_SMALL);
         this.setUpPhysics('static');
-        this.coins = value;
+        if (value)
+            this.coins = value;
 
         // Set up animations
         try

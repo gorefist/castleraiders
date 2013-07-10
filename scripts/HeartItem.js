@@ -12,7 +12,8 @@ HeartItemClass = EntityClass.extend({
     {
         this.parent(pos, HEART_SIZE);
         this.setUpPhysics('static');
-        this.recoveryPoints = value;
+        if (value)
+            this.recoveryPoints = value;
 
         // Set up animations
         try

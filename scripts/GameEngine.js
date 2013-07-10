@@ -33,7 +33,7 @@ var HEART_ANIM_SPEED = 0.3;     // for heart items
 
 // Constants for current soldier cursor
 
-var CURSOR_ALPHA = 0.75; // opacity of the cursor
+var CURSOR_ALPHA = 0.35; // opacity of the cursor
 var CURSOR_RADIUS = 15; // horizontal radius of the elipse
 var CURSOR_OFFSET = 27.5; // y-offset of the cursor
 
@@ -109,7 +109,7 @@ GameEngineClass = Class.extend({
                 }
             }
         });
-        
+
         gMap.readMetadata();
 
         // Set user control to first human
@@ -119,8 +119,8 @@ GameEngineClass = Class.extend({
     // [Sergio D. Jubera]
     // I needed different params for soldiers (skeletons/humans) than for items
     // (hearts/chests) so I splitted 'spawnEntity' into the followings:
-    spawnSoldier: function(typename, pos, size, soldierType, name, maxHitPoints) {
-        var ent = new (gGameEngine.factory[typename])(pos, size, soldierType, name, maxHitPoints);
+    spawnSoldier: function(typename, pos, size, soldierType, name, maxHitPoints, damage, faceAngle) {
+        var ent = new (gGameEngine.factory[typename])(pos, size, soldierType, name, maxHitPoints, damage, faceAngle);
         gGameEngine.entities.push(ent);
         return ent;
     },
@@ -309,23 +309,28 @@ GameEngineClass = Class.extend({
         // Draw map (partially)
         gMap.drawBackground(ctx);
         gGameEngine._drawWorldBounds(); // for debug
-        
+
         // Draw cursor for current soldier
         gGameEngine._drawPointer();
-        
+
+        // Draw the rest of the map
+        gMap.drawElements(ctx);
+
         // Draw entities ordered by pos.y, to make the pseudo-3D effect
         var orderedEntities = gGameEngine.entities.slice(); //shallow copy
         orderedEntities.sort(compareVerticalPosition);
         for (var i = 0; i < orderedEntities.length; i++)
             orderedEntities[i].draw();
-        
-        // Draw the rest of the map
-        gMap.drawElements(ctx);
+
         gMap.drawForeground(ctx);
-        
+
+        for (var i = 0; i < orderedEntities.length; i++)
+            if (orderedEntities[i].drawGui)
+                orderedEntities[i].drawGui();
+
         gPhysicsEngine.drawBodies();    // for debug
         ctx.restore();
-        
+
         gGameEngine._drawDebugInfo();   // for debug
     },
     // [Sergio D. Jubera]

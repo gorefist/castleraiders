@@ -281,7 +281,7 @@ var TILEDMapClass = Class.extend({
         // for collisions, entity spawn, etc.
         for (var layerIdx = 0; layerIdx < gMap.currMapData.layers.length; layerIdx++) {
             var lyr = gMap.currMapData.layers[layerIdx];
-            if (lyr.type == "objectgroup")
+            if (lyr.type == "objectgroup" && lyr.visible)
             {
                 if (lyr.name == 'collisions') {
                     // walls and static objects (trees, rocks, etc.)
@@ -295,16 +295,25 @@ var TILEDMapClass = Class.extend({
                     // Entities spawn coordinates (width & height are ignored)
                     for (var i = 0; i < lyr.objects.length; i++) {
                         var obj = lyr.objects[i];
-//                        var ent = new EntityClass({x: obj.x + obj.width * 0.5, y: obj.y + obj.height * 0.5}, {w: obj.width, h: obj.height});
-//                        ent.setUpPhysics('static');
 
-//                        gGameEngine.spawnSoldier('soldier', {x: 100, y: 100}, {w: 26, h: 30}, 'skeleton', 'Skeleton A');
-//                        gGameEngine.spawnSoldier('soldier', {x: 600, y: 400}, {w: 26, h: 30}, 'human', 'Sergio');
-//                        gGameEngine.spawnItem('heart', {x: 200, y: 200}, 30);
-//                        gGameEngine.spawnItem('chest', {x: 300, y: 300}, 230);
-
-
-
+                        if (obj.name === 'soldier') {
+                            gGameEngine.spawnSoldier('soldier',
+                                    {x: obj.x, y: obj.y},
+                                    SOLDIER_SIZE,
+                                    obj.type,
+                                    obj.properties ? obj.properties.name : null,
+                                    obj.properties ? obj.properties.maxHP : null,
+                                    obj.properties ? obj.properties.damage : null,
+                                    obj.properties ? obj.properties.faceAngle : null);
+//                            console.log("Spawn" + 
+//                                    (obj.type? (" " + obj.type + " "): "") +
+//                                    "soldier: " +
+//                                    (obj.properties ? obj.properties.name : null) + "," +
+//                                    (obj.properties ? obj.properties.maxHP : null) + "," +
+//                                    (obj.properties ? obj.properties.damage : null));
+                        }
+                        else if (obj.name === 'chest' || obj.name === 'heart')
+                            gGameEngine.spawnItem(obj.name, {x: obj.x, y: obj.y}, obj.properties ? obj.properties.value : null);
                     }
                 }
             }

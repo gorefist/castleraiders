@@ -10,12 +10,12 @@
  </layer>
  <layer name="wallsAndObjects" width="70" height="70">
   <data encoding="base64" compression="zlib">
-   eJztmr1OwzAQx71CAHWDFoTCAC2sfIiFgY/yEMDM1yvwAAywIgQrQrCCgAfgybgIVUpP58ROnLPj3k/6q0lq+9Lr2XHsm1JKTYNmckrQcYKOE6J8UlLXtDy+huvMguZU88yDFkA9UBcJXzM575WU62nqdkvqjj4XQUuNeGKcVdAaaADqaz4HufM+Oi/6TtceLpu/VtRmpnXQRiOeGGeTwYZrdhls7DPYcI34hYbDL9KPaNoYL8cMNtrol9jiZQu0Ddqp2U5s48sB6BB0VLOdkPvRFzp/rHsjFnD4pWq8/IJOQDegM9Crszsq5g50z2Cnql+yeMn8cqr+/cIVL0+gZwY7VftRlXi5BF2BrivazHgDvdeob0qd55GL32nLN+iHwU4b57sciF9oQpjvnoMufN8EQuKFJoR4CREX8eLqvccErnVvF/Hi6r3HBK51b87xxUVcxbju7SquYlt/cUXI6ww+iW1dyhXSj2jELzQyvtCIX2hs+9EQlIJWLOq00S8hr3v7RMZdGo54uVV0nlhRzhjO8aLq6nLJdDlkRW3gMhz7JA+qOH8MH+tkk0dWVo8qk2+HY5/kRdE5YzjHqyh3jMoBs2kL55xROWj57zj2ST5Anwx2XNHkPkmnoXbbzrLvGxAEQYiUoe8bEAQhCmQOS9PUHFb8TSPvDEJsSF+nMe3rqbLbK3HJnie7oTEJfkiVvzjjZBL+y7bT0RybEPP/u6w5FgQhzGeYzH9pqoxfqTL7f2N+BghCRuwx7nPc5LZts5flc943sv0HkHpImw==
+   eJztmk1OwzAQhXOS7qCFLT9iw4LfQwBr/q7AcRCCLUhwAE7GixAiWJMotqdje3if9NSmaT3uy4yTOO46QuazAW1CK2g58roabC+D7al9Y+2F3x1+NtVmry1oey1O/GXHIIY2BwYxjgxiaENfZCx8YR3JtJgv5wYxWvTFW77sQnvQfmY73saXY+gEOs1sh3UkY+FLar58QhfQA3QFPan1qA5y6qj35bL79sUbqXWUki+30B10nxiz5xl6yfj9XHLGF43/Gcs79GEQp8XrXQvoi0wN5+lr6KZ0JwKYLzI15EuNaOSL1n1PTWjki9Z9T01Yji8aeeVx3lsrr7zNv2jBeQYZb/NSWrCOZOiLDMcXGfoiE1tHZwkxWvSl5nnvknDclbHIF0JieOzkNWPhGq+ptWPSGrCYtsI1Z9IatOE+i+ckr9CbQRwtrJ6TkF8WpTtACCFOSbmPJIQQMg9ew9pCvwn5H7RQ64elO1AJ9MEPPJa+8Xx8FyPvCSGkJdY5fnk+BxDSwxz3Q8yzrJLXfT+xvwBvlDJR
   </data>
  </layer>
  <layer name="foreground" width="70" height="70">
   <data encoding="base64" compression="zlib">
-   eJzt2UsOgjAQAFD8rY26Nh6DS6j3P45dkMiCGCDgtPS9ZNJlJ9B2pmnTAAAAjPdM8Urxjk6ETbK+AAAAALbrmOIUnURm2hTXFLfoRACAWXYp9ikO0Ylk5tyNl9As8nPvxkdoFkDp2ugEgOLpYYet1cOW/r3X6mHdGYa5M5Rryl6v6a1kyl6v6a3kH3u9pnU2RU3rjHz1a0bpveKS+jVDr/jVrxm19Ipq2LDcatjc82vr/3fu+ZXb/11aLecX/BLZ90XMPfYtK7Lvy7nnjDw3+3N/API/Bsw=
+   eJztmklOxDAQRc20oMPMAjqACKfoSwDXYgFb1IJz9AGpBagtyxnsTlI2fk/6yiBXUortuJKqY2PMQnRiqXL2K2e/8rSvemyHtnfPuTanojMzPTeiW1EtWjpyzw05rnva1S22yx7bv+2d6H6SJwEAAAAAsGUjeha9iF5Fa113iudd9KHtRAcb53jIeLHHVyxfou8d7AEAAADmZq7/3rnBf28AAID/x6HoSNuJxFiJrkTX2o4kSCN60nYCoDDejL9OrKtmzK3x8tm21ZK11ZB1XcNtM0ee5NN014+5+20KqSPrs/O1sa9DnmQ+9kT7ogNtRxLjXHQhutR2JDEefrePql4AQO6stB0AgOwhhvUzVQyb+/OeKoblm8EP3wz5EjLXS8qVhMz1knIlIXO9MXG5kpLGWQgljbMQGkNObk7sNSP3WHFM7DWDWHGLvWaUEiuyhvlJbQ2LfX+N3b+NSWsNi31/pda/YxP7/mpMWv0LsAuacZ/GvYfmsjTjvpRjTs24z773DxM0HRY=
   </data>
  </layer>
  <objectgroup name="collisions" width="70" height="70">
@@ -63,19 +63,20 @@
   </object>
   <object name="chest" x="162" y="121" width="39" height="39">
    <properties>
-    <property name="coins" value="250"/>
+    <property name="value" value="250"/>
    </properties>
   </object>
   <object name="heart" x="2280" y="1161" width="39" height="39">
    <properties>
-    <property name="hitPoints" value="15"/>
+    <property name="value" value="15"/>
    </properties>
   </object>
   <object name="soldier" type="human" x="2321" y="2361" width="39" height="39">
    <properties>
+    <property name="damage" value="25"/>
     <property name="faceAngle" value="down"/>
     <property name="maxHP" value="200"/>
-    <property name="name" value="Lord Sergio"/>
+    <property name="name" value="Sir Sergio"/>
    </properties>
   </object>
   <object name="soldier" type="skeleton" x="1840" y="841" width="39" height="39">
@@ -134,5 +135,7 @@
     <property name="faceAngle" value="up"/>
    </properties>
   </object>
+  <object name="chest" x="259" y="122" width="39" height="39"/>
+  <object name="heart" x="2341" y="1162" width="39" height="39"/>
  </objectgroup>
 </map>

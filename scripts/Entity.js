@@ -20,8 +20,7 @@ EntityClass = Class.extend({
     // [Sergio D. Jubera]
     // I brought this here since all entities may have a physic body. In case an
     // entity doesn't need one, it will just stay null.
-    setUpPhysics: function(bodyType)
-    {
+    setUpPhysics: function(bodyType) {
         var entityDef = {
             x: this.pos.x, // Do NOT convert to meters, it will be converted by gPhysicsEngine.addBody()
             y: this.pos.y, // Do NOT convert to meters, it will be converted by gPhysicsEngine.addBody()
@@ -39,8 +38,7 @@ EntityClass = Class.extend({
         // with the constructed entityDef.
         this.physBody = gPhysicsEngine.addBody(entityDef);
     },
-    drawEntityId: function(entityType)
-    {
+    drawEntityId: function(entityType) {
         if (DEBUG_SHOW_ENTITIES)
         {
             var physPos = {

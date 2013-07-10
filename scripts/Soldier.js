@@ -3,15 +3,15 @@
 // differences by now are that skeletons will always be controlled by CPU
 // (while humans may be controlled by user) and the sprites used, obviously.
 
-var SOLDIER_NAME_OFFSET = 40;       // y-offset to draw the name of the soldier
-var LIFE_BAR_OFFSET = -25;          // y-offset to draw the life bar
-var LIFE_BAR_LENGTH = 50;           // total length of the life bar
-var LIFE_BAR_WIDTH = 5;             // with of the life bar
-var LIFE_BAR_CAP = "round";         // style of life bar ends
-var LOW_HP = 0.2;                   // percentage of HP considered low
-var MED_HP = 0.6;                   // percentage of HP considered medium
-var SOLDIER_ANIM_OFFSET = {x: 0, y: -16};   // Needed for the pseudo-3D effect
-
+var SOLDIER_NAME_OFFSET = 40; // y-offset to draw the name of the soldier
+var LIFE_BAR_OFFSET = -25; // y-offset to draw the life bar
+var LIFE_BAR_LENGTH = 50; // total length of the life bar
+var LIFE_BAR_WIDTH = 5; // with of the life bar
+var LIFE_BAR_CAP = "round"; // style of life bar ends
+var LOW_HP = 0.2; // percentage of HP considered low
+var MED_HP = 0.6; // percentage of HP considered medium
+var SOLDIER_ANIM_OFFSET = {x: 0, y: -16}; // Needed for the pseudo-3D effect
+var SOLDIER_SIZE = {w: 26, h: 30};
 SoldierClass = EntityClass.extend({
     actions: ['stop', 'walk', 'attack'],
     directions: ['up', 'down', 'left', 'right'],
@@ -19,7 +19,7 @@ SoldierClass = EntityClass.extend({
     // and/or enemies
     hitPoints: 100.0, // when 0, it's dead
     damagePoints: 15, // damage the soldier does when attacking sb
-    name: "Soldier 1", // it could be customized and displayed so that you can
+    name: '', // it could be customized and displayed so that you can
     // have your custom army, and for skeletons it may be used for bosses, etc.
     drawName: true,
     speed: DEFAULT_WALKING_VELOCITY,
@@ -35,7 +35,7 @@ SoldierClass = EntityClass.extend({
     animations: {}, // dictionary for all animations, "currentState" will be
     // used as key
 
-    init: function(pos, size, soldierType, name, maxHitPoints, damage) {
+    init: function(pos, size, soldierType, name, maxHitPoints, damage, faceAngle) {
         this.parent(pos, size);
         this.soldierType = soldierType;
         if (name)
@@ -44,17 +44,17 @@ SoldierClass = EntityClass.extend({
             this.maxHitPoints = maxHitPoints;
         this.hitPoints = this.maxHitPoints;
         if (damage)
-            this.damage = damage;
+            this.damagePoints = damage;
+        if (faceAngle)
+            this.currentState.dir = isNaN(faceAngle)? faceAngle : faceAngleToString(faceAngle);
         this.setUpPhysics('dynamic');
         this._setupAnimations();
-
         //console.log(this.hitPoints + "/" + this.maxHitPoints);
     },
     animate: function() {
         var currentFrame = this._currentAnim().currentFrame;
         this._currentAnim().animate();
         var nextFrame = this._currentAnim().currentFrame;
-
         // If it's attacking and the animation is over, return to still state
         if (this.currentState.action === 'attack' && nextFrame < currentFrame)
         {
@@ -65,7 +65,7 @@ SoldierClass = EntityClass.extend({
     update: function() {
         if (this.health <= 0)
         {
-            // this.isDead = true;
+// this.isDead = true;
             this.physBody.SetActive(false);
         }
 
@@ -78,26 +78,21 @@ SoldierClass = EntityClass.extend({
                 this._move(this.inputInfo.move_dir);
             else
                 this._stop();
-
             // look (quantized) at mouse
             if (this.currentState.action !== 'attack')  // Don't interrupt attack
-                if (this.inputInfo.faceAngle0to3 < 1)
-                    this.currentState.dir = 'right';
-                else if (this.inputInfo.faceAngle0to3 < 2)
-                    this.currentState.dir = 'down';
-                else if (this.inputInfo.faceAngle0to3 < 3)
-                    this.currentState.dir = 'left';
-                else
-                    this.currentState.dir = 'up';
-
+                this.currentState.dir = faceAngleToString(this.inputInfo.faceAngle0to3);
+            
             if (this.inputInfo.fire0)
                 this._attack();
         }
     },
-    draw: function()
-    {
-        // Draw life bar
-        // 1. Draw full black line from right to left (100% HP), and then
+    draw: function() {
+        this.animations[this.currentState.action + "_" + this.currentState.dir].draw(this.pos.x, this.pos.y);
+        this.animate();
+    },
+    drawGui: function() {
+        // 1. Life bar:
+        // Draw full black line from right to left (100% HP), and then
         // draw color line from left to right (current %HP)
         if ((this.soldierType === 'human' && SHOW_LIFE_BAR_HUMANS) ||
                 (this.soldierType === 'skeleton' && SHOW_LIFE_BAR_SKELETONS))
@@ -122,7 +117,7 @@ SoldierClass = EntityClass.extend({
             ctx.stroke();
         }
 
-        // Draw name
+        // 2. Soldier's name
         if (this.drawName && (
                 (this.soldierType === 'human' && SHOW_NAME_HUMANS) ||
                 (this.soldierType === 'skeleton' && SHOW_NAME_SKELETONS)))
@@ -133,37 +128,29 @@ SoldierClass = EntityClass.extend({
             ctx.fillStyle = "#000000";
             ctx.fillText(this.name, this.pos.x, this.pos.y + SOLDIER_NAME_OFFSET + SOLDIER_ANIM_OFFSET.y);
         }
-
-        // Draw soldier
-        this.animations[this.currentState.action + "_" + this.currentState.dir].draw(this.pos.x, this.pos.y);
-        this.animate();
-
-        this.drawEntityId(this.soldierType); // for debug
+        
+        // 3. Debug info
+        this.drawEntityId(this.soldierType);
     },
     // The following methods modify soldier state for animation purposes
-    _stop: function()
-    {
+    _stop: function() {
         if (this.currentState.action !== 'attack')  // Don't interrupt attack
         {    // animation
             this.currentState.action = 'stop';
             this._resetAnimation();
         }
     },
-    _move: function(move_dir)
-    {
+    _move: function(move_dir) {
         if (this.currentState.action !== 'attack')  // Don't interrupt attack
         {   // animation
             this.currentState.action = 'walk';
-            
             this.physBody.SetLinearVelocity(move_dir);
         }
     },
-    _attack: function()
-    {
+    _attack: function() {
         this.currentState.action = 'attack';
     },
-    _resetAnimation: function()
-    {
+    _resetAnimation: function() {
         this.animations[this.currentState.action + "_" + this.currentState.dir].reset();
     },
     _currentAnim: function() {
@@ -178,13 +165,11 @@ SoldierClass = EntityClass.extend({
                 {
                     var anim_name = this.actions[a] + "_" + this.directions[d];
                     var anim_obj = new AnimationClass(SOLDIER_ANIM_OFFSET);
-
                     //console.log("Loading animations for " + this.soldierType + "_" + anim_name);
 
                     var tens = 0;
                     var units = 0;
                     var frame = 0;
-
                     while (frame !== null)
                     {
                         frame = gSpriteSheets['animation'].getStats(this.soldierType + "_" + anim_name + tens + units + ".png");
@@ -200,7 +185,6 @@ SoldierClass = EntityClass.extend({
                         }
                     }
                     this.animations[anim_name] = anim_obj;
-
                     //console.log("total frames: " + anim_obj.frames.length);
                 }
             }
@@ -210,44 +194,30 @@ SoldierClass = EntityClass.extend({
             console.log(e.stack);
         }
     },
-    onTouch: function(otherBody, point, impulse)
-    {
-        // For this game, point and impulse are not necessary
+    onTouch: function(otherBody, point, impulse) {
+// For this game, point and impulse are not necessary
 
         var otherEnt = otherBody.GetDefinition().userData.ent;
-
         if (!this._killed && !otherEnt._killed)
         {
             if (otherEnt instanceof SoldierClass)
             {
-                // TO DO: add a physic body with .isSensor = true to the soldiers,
-                // bigger than the physic body itself, to allow attacking enemies
-                // without needing to touch them.
-                
-                // Check if it's an attack
+// TO DO: add a physic body with .isSensor = true to the soldiers,
+// bigger than the physic body itself, to allow attacking enemies
+// without needing to touch them.
+
+// Check if it's an attack
                 if (this.currentState.action === 'attack' &&
                         (OPTIONS_FRIENDLY_FIRE || otherEnt.soldierType != this.soldierType) &&
-                        this._currentAnim().currentFrame < this._currentAnim().speed) // check it's the very beginning of the attack, so that damage is triggered just once
+                        Math.ceil(this._currentAnim().currentFrame) === 0) // check it's the very beginning of the attack, so that damage is triggered just once
                 {
-                    // check if the attacker is facing the target, using the
-                    // quantized angle technique again
+// check if the attacker is facing the target, using the
+// quantized angle technique again
                     var otherDir = new Vec2(otherEnt.pos.x - this.pos.x, otherEnt.pos.y - this.pos.y);
                     var otherAngle0to3 = quantizeAngle(otherDir, 4);
-                    var facingTarget = false;
-
-                    if (otherAngle0to3 < 1)
-                        facingTarget = this.currentState.dir === 'right';
-                    else if (otherAngle0to3 < 2)
-                        facingTarget = this.currentState.dir === 'down';
-                    else if (otherAngle0to3 < 3)
-                        facingTarget = this.currentState.dir === 'left';
-                    else
-                        facingTarget = this.currentState.dir === 'up';
-
-                    if (facingTarget)
+                    if (this.currentState.dir === faceAngleToString(otherAngle0to3))
                     {
                         console.log(this.physBody.GetDefinition().userData.id + " does " + this.damagePoints + " damage points to " + otherEnt.physBody.GetDefinition().userData.id);
-
                         if (otherEnt.receiveDamage)
                             otherEnt.receiveDamage(this.damagePoints);
                     }
@@ -257,7 +227,6 @@ SoldierClass = EntityClass.extend({
                     (otherEnt instanceof HeartItemClass || otherEnt instanceof ChestItemClass))
             {
                 console.log(this.physBody.GetDefinition().userData.id + " grabs item " + otherBody.GetDefinition().userData.id + ".");
-
                 otherEnt.itemEffects(this);
             }
         }
@@ -266,17 +235,15 @@ SoldierClass = EntityClass.extend({
     },
     receiveDamage: function(dmgPoints) {
         this.hitPoints -= dmgPoints;
-
         if (this.hitPoints <= 0)
         {
-            //gPhysicsEngine.removeBody(this.physBody); // moved it to gGameEngine.update(), when all killed entities are effectively destroyed (step 2)
+//gPhysicsEngine.removeBody(this.physBody); // moved it to gGameEngine.update(), when all killed entities are effectively destroyed (step 2)
             this._killed = true;
             var effectName = this.soldierType === 'skeleton' ? 'skeleton_die' : 'human_die';
             gGameEngine.spawnEffect('instancedEffect', this.pos, effectName, false);
         }
-        // else
-        // TO DO: add a visual for damage effect
+// else
+// TO DO: add a visual for damage effect
     }
 });
-
 gGameEngine.factory['soldier'] = SoldierClass;
