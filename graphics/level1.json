@@ -508,7 +508,8 @@
                  "name":"soldier",
                  "properties":
                     {
-                     "faceAngle":"right"
+                     "faceAngle":"right",
+                     "route":"doorWatch1"
                     },
                  "type":"skeleton",
                  "visible":true,
@@ -563,13 +564,14 @@
                  "name":"soldier",
                  "properties":
                     {
-                     "faceAngle":"right"
+                     "faceAngle":"right",
+                     "route":"doorWatch2"
                     },
                  "type":"skeleton",
                  "visible":true,
                  "width":39,
-                 "x":1840,
-                 "y":841
+                 "x":1841,
+                 "y":880
                 }, 
                 {
                  "height":39,
@@ -577,7 +579,8 @@
                  "properties":
                     {
                      "faceAngle":"down",
-                     "name":"Skull Boss"
+                     "name":"Skull Boss",
+                     "route":"bossWalk"
                     },
                  "type":"skeleton",
                  "visible":true,
@@ -727,6 +730,95 @@
                  "width":39,
                  "x":2341,
                  "y":1162
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "width":70,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "height":70,
+         "name":"routes",
+         "objects":[
+                {
+                 "height":0,
+                 "name":"doorWatch1",
+                 "polyline":[
+                        {
+                         "x":0,
+                         "y":0
+                        }, 
+                        {
+                         "x":-1,
+                         "y":278
+                        }],
+                 "properties":
+                    {
+
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1860,
+                 "y":460
+                }, 
+                {
+                 "height":0,
+                 "name":"doorWatch2",
+                 "polyline":[
+                        {
+                         "x":0,
+                         "y":0
+                        }, 
+                        {
+                         "x":-1,
+                         "y":278
+                        }],
+                 "properties":
+                    {
+
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1859,
+                 "y":740
+                }, 
+                {
+                 "height":0,
+                 "name":"bossWalk",
+                 "polyline":[
+                        {
+                         "x":-6,
+                         "y":0
+                        }, 
+                        {
+                         "x":272,
+                         "y":0
+                        }, 
+                        {
+                         "x":272,
+                         "y":234
+                        }, 
+                        {
+                         "x":-6,
+                         "y":235
+                        }, 
+                        {
+                         "x":-6,
+                         "y":0
+                        }],
+                 "properties":
+                    {
+
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":148,
+                 "y":224
                 }],
          "opacity":1,
          "type":"objectgroup",

@@ -316,6 +316,8 @@ var TILEDMapClass = Class.extend({
                             gGameEngine.spawnItem(obj.name, {x: obj.x, y: obj.y}, obj.properties ? obj.properties.value : null);
                     }
                 }
+                else if (lyr.name == 'route') {
+                }
             }
         }
 

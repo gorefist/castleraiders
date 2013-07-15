@@ -46,7 +46,7 @@ SoldierClass = EntityClass.extend({
         if (damage)
             this.damagePoints = damage;
         if (faceAngle)
-            this.currentState.dir = isNaN(faceAngle)? faceAngle : faceAngleToString(faceAngle);
+            this.currentState.dir = isNaN(faceAngle) ? faceAngle : faceAngleToString(faceAngle);
         this.setUpPhysics('dynamic');
         this._setupAnimations();
         //console.log(this.hitPoints + "/" + this.maxHitPoints);
@@ -65,10 +65,10 @@ SoldierClass = EntityClass.extend({
     update: function() {
         if (this.health <= 0)
         {
-// this.isDead = true;
+            // this.isDead = true;
             this.physBody.SetActive(false);
         }
-
+        this.animate();
     },
     applyInputs: function() {
         if (this.inputInfo)
@@ -77,18 +77,20 @@ SoldierClass = EntityClass.extend({
             if (this.inputInfo.walking)
                 this._move(this.inputInfo.move_dir);
             else
-                this._stop();
+                this.stop();
             // look (quantized) at mouse
             if (this.currentState.action !== 'attack')  // Don't interrupt attack
                 this.currentState.dir = faceAngleToString(this.inputInfo.faceAngle0to3);
-            
+
             if (this.inputInfo.fire0)
                 this._attack();
+            
+            //DO NOT FORGET to clear inputInfo!!!
+            this.inputInfo = null;
         }
     },
     draw: function() {
         this.animations[this.currentState.action + "_" + this.currentState.dir].draw(this.pos.x, this.pos.y);
-        this.animate();
     },
     drawGui: function() {
         // 1. Life bar:
@@ -128,12 +130,12 @@ SoldierClass = EntityClass.extend({
             ctx.fillStyle = "#000000";
             ctx.fillText(this.name, this.pos.x, this.pos.y + SOLDIER_NAME_OFFSET + SOLDIER_ANIM_OFFSET.y);
         }
-        
+
         // 3. Debug info
         this.drawEntityId(this.soldierType);
     },
     // The following methods modify soldier state for animation purposes
-    _stop: function() {
+    stop: function() {
         if (this.currentState.action !== 'attack')  // Don't interrupt attack
         {    // animation
             this.currentState.action = 'stop';
@@ -194,25 +196,27 @@ SoldierClass = EntityClass.extend({
             console.log(e.stack);
         }
     },
+    // Function callback for collisions. For this game, point and impulse are
+    // not necessary.
     onTouch: function(otherBody, point, impulse) {
-// For this game, point and impulse are not necessary
+
 
         var otherEnt = otherBody.GetDefinition().userData.ent;
         if (!this._killed && !otherEnt._killed)
         {
             if (otherEnt instanceof SoldierClass)
             {
-// TO DO: add a physic body with .isSensor = true to the soldiers,
-// bigger than the physic body itself, to allow attacking enemies
-// without needing to touch them.
+                // TO DO: add a physic body with .isSensor = true to the soldiers,
+                // bigger than the physic body itself, to allow attacking enemies
+                // without needing to touch them.
 
-// Check if it's an attack
+                // Check if it's an attack
                 if (this.currentState.action === 'attack' &&
                         (OPTIONS_FRIENDLY_FIRE || otherEnt.soldierType != this.soldierType) &&
                         Math.ceil(this._currentAnim().currentFrame) === 0) // check it's the very beginning of the attack, so that damage is triggered just once
                 {
-// check if the attacker is facing the target, using the
-// quantized angle technique again
+                    // check if the attacker is facing the target, using the
+                    // quantized angle technique again
                     var otherDir = new Vec2(otherEnt.pos.x - this.pos.x, otherEnt.pos.y - this.pos.y);
                     var otherAngle0to3 = quantizeAngle(otherDir, 4);
                     if (this.currentState.dir === faceAngleToString(otherAngle0to3))
@@ -237,13 +241,13 @@ SoldierClass = EntityClass.extend({
         this.hitPoints -= dmgPoints;
         if (this.hitPoints <= 0)
         {
-//gPhysicsEngine.removeBody(this.physBody); // moved it to gGameEngine.update(), when all killed entities are effectively destroyed (step 2)
+            //gPhysicsEngine.removeBody(this.physBody); // moved it to gGameEngine.update(), when all killed entities are effectively destroyed (step 2)
             this._killed = true;
             var effectName = this.soldierType === 'skeleton' ? 'skeleton_die' : 'human_die';
             gGameEngine.spawnEffect('instancedEffect', this.pos, effectName, false);
         }
-// else
-// TO DO: add a visual for damage effect
+        // else
+        // TO DO: add a visual for damage effect
     }
 });
 gGameEngine.factory['soldier'] = SoldierClass;

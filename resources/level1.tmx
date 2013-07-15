@@ -59,6 +59,7 @@
   <object name="soldier" type="skeleton" x="1841" y="600" width="39" height="39">
    <properties>
     <property name="faceAngle" value="right"/>
+    <property name="route" value="doorWatch1"/>
    </properties>
   </object>
   <object name="chest" x="162" y="121" width="39" height="39">
@@ -79,15 +80,17 @@
     <property name="name" value="Sir Sergio"/>
    </properties>
   </object>
-  <object name="soldier" type="skeleton" x="1840" y="841" width="39" height="39">
+  <object name="soldier" type="skeleton" x="1841" y="880" width="39" height="39">
    <properties>
     <property name="faceAngle" value="right"/>
+    <property name="route" value="doorWatch2"/>
    </properties>
   </object>
   <object name="soldier" type="skeleton" x="121" y="202" width="39" height="39">
    <properties>
     <property name="faceAngle" value="down"/>
     <property name="name" value="Skull Boss"/>
+    <property name="route" value="bossWalk"/>
    </properties>
   </object>
   <object name="soldier" type="human" x="2281" y="2441" width="39" height="39">
@@ -137,5 +140,16 @@
   </object>
   <object name="chest" x="259" y="122" width="39" height="39"/>
   <object name="heart" x="2341" y="1162" width="39" height="39"/>
+ </objectgroup>
+ <objectgroup name="routes" width="70" height="70">
+  <object name="doorWatch1" x="1860" y="460">
+   <polyline points="0,0 -1,278"/>
+  </object>
+  <object name="doorWatch2" x="1859" y="740">
+   <polyline points="0,0 -1,278"/>
+  </object>
+  <object name="bossWalk" x="148" y="224">
+   <polyline points="-6,0 272,0 272,234 -6,235 -6,0"/>
+  </object>
  </objectgroup>
 </map>

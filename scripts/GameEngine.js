@@ -5,9 +5,10 @@
 // TO DO: read debug settings from file/game options rather than hardcoding them
 // Constants for debug
 var DEBUG_SHOW_FPS = true;
-var DEBUG_SHOW_PHYSIC_BODIES = true;
-var DEBUG_SHOW_ENTITIES = true; // draws entity array and their ids
-var DEBUG_SHOW_MAP_BOUNDS = true;
+var DEBUG_SHOW_PHYSIC_BODIES = false;
+var DEBUG_SHOW_PHYSIC_SENSORS = true;   // for AI triggers & game events
+var DEBUG_SHOW_ENTITIES = false; // draws entity array and their ids
+var DEBUG_SHOW_MAP_BOUNDS = false;
 
 // Game constants
 var DEFAULT_WALKING_VELOCITY = 3.0; // in m/s
@@ -181,8 +182,8 @@ GameEngineClass = Class.extend({
             else {
                 gGameEngine._deferredKill.push(ent);
                 if (i <= gGameEngine._currentSoldierIdx)
-                    // The index of the currentSoldier is gonna decrease,
-                    // I need to update it.
+                    // The index of the currentSoldier is going to decrease,
+                    // it must be updated:
                     gGameEngine._currentSoldierIdx = gGameEngine._currentSoldierIdx - 1 < 0 ? gGameEngine.entities.length - 1 : gGameEngine._currentSoldierIdx - 1;
             }
         }
@@ -219,14 +220,6 @@ GameEngineClass = Class.extend({
         // This has to be after apply inputs, so that we can update the physics
         // engine between them (different calls)
 
-        // Change focus to next soldier
-        if (gInputEngine.actions['next_soldier'])
-        {
-            gGameEngine.nextSoldier();
-            gInputEngine.actions['next_soldier'] = false; //to avoid passing
-            // too fast if user doesn't release the key or does it too late
-        }
-
         var inputInfo = {
             move_dir: new Vec2(0, 0),
             faceAngle0to3: 0, // Limited to 4 directions
@@ -235,26 +228,6 @@ GameEngineClass = Class.extend({
             //fire1: false,
             //fire2: false
         };
-        // Movement (keyboard)
-        var move_dir = new Vec2(0, 0);
-        if (gInputEngine.actions['walk_up'])
-            move_dir.y -= 1;
-        if (gInputEngine.actions['walk_down'])
-            move_dir.y += 1;
-        if (gInputEngine.actions['walk_left'])
-            move_dir.x -= 1;
-        if (gInputEngine.actions['walk_right'])
-            move_dir.x += 1;
-        if (move_dir.LengthSquared())
-        {
-            move_dir.Normalize();
-            move_dir.Multiply(gGameEngine.currentSoldier().speed);
-
-            inputInfo.walking = true;
-            inputInfo.move_dir = move_dir;
-        }
-//        else  // not really needed, it's the default
-//            inputInfo.walking = false;
 
         // Looking direction (based on mouse position):
         // this is based on lesson "Input", chapter "Quantize" of the Udacity
@@ -263,11 +236,44 @@ GameEngineClass = Class.extend({
         // characters, only.
         var look_dir = new Vec2(gInputEngine.mouse.x - gGameEngine.currentSoldier().pos.x, gInputEngine.mouse.y - gGameEngine.currentSoldier().pos.y);
         inputInfo.faceAngle0to3 = quantizeAngle(look_dir, 4);
-        // Attack
-        if (gInputEngine.actions['attack'])
+
+        // Change focus to next soldier
+        if (gInputEngine.actions['next_soldier'])
         {
-            inputInfo.fire0 = true;
-            gInputEngine.actions['attack'] = false;
+            gGameEngine.currentSoldier().stop();
+            gGameEngine.nextSoldier();
+            gInputEngine.actions['next_soldier'] = false; //to avoid passing
+            // too fast if user doesn't release the key or does it too late
+        }
+        else {
+
+            // Movement (keyboard)
+            var move_dir = new Vec2(0, 0);
+            if (gInputEngine.actions['walk_up'])
+                move_dir.y -= 1;
+            if (gInputEngine.actions['walk_down'])
+                move_dir.y += 1;
+            if (gInputEngine.actions['walk_left'])
+                move_dir.x -= 1;
+            if (gInputEngine.actions['walk_right'])
+                move_dir.x += 1;
+            if (move_dir.LengthSquared())
+            {
+                move_dir.Normalize();
+                move_dir.Multiply(gGameEngine.currentSoldier().speed);
+
+                inputInfo.walking = true;
+                inputInfo.move_dir = move_dir;
+            }
+            else
+                inputInfo.walking = false;
+
+            // Attack
+            if (gInputEngine.actions['attack'])
+            {
+                inputInfo.fire0 = true;
+                gInputEngine.actions['attack'] = false;
+            }
         }
 
         if (gGameEngine.currentSoldier())
