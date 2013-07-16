@@ -7,7 +7,7 @@ var TILEDMapClass = Class.extend({
     loop: true,
     backAndForth: false,
     _currentPointIdx: -1,
-    _currentDirection: 'forwards',   // 'forwards' | 'backwards'
+    _currentDirection: 'forwards', // 'forwards' | 'backwards'
     init: function(loop, backAndForth) {
         if (loop)
             this.loop = loop;
@@ -18,48 +18,84 @@ var TILEDMapClass = Class.extend({
     currentPoint: function() {
         if (this._currentPointIdx < 0)
             return null;
-        
+
         return this._points[this._currentPointIdx];
     },
     // Returns the next point of the route, based on current direction and 
     // "loop" and "backAndForth" properties.
     nextPoint: function() {
         var pIdx = this._nextPointIdx();
-        
+
         if (pIdx < 0 || pIdx === null)
             return null;
-        
+
         return this._points[pIdx];
     },
     // Returns the previous point of the route, based on current direction and
     // "loop" and "backAndForth" properties.
     previousPoint: function() {
         var pIdx = this._previousPointIdx();
-        
+
         if (pIdx < 0 || pIdx === null)
             return null;
-        
+
         return this._points[pIdx];
     },
     // Updates current point to the next one, based on current direction and 
     // "loop" and "backAndForth" properties. Returns "false" when it's reached
     // the end of the route, and "true" otherwise.
-    moveForward: function() {
-        this._currentPointIdx = this._nextPointIdx();
-        return !(this._currentPointIdx < 0 || this._currentPointIdx === 'null');
+    moveToNext: function() {
+        var next = this._nextPointIdx();
+
+        //Update direction if necessary (only if "backAndForth" === true):
+        if (this.backAndForth) {
+            if (next && next >= 0 && next < this._points.length) {
+                if (this.loop) {
+                    if (this._currentDirection === 'forwards' && next === this._currentPointIdx - 1)
+                        direction = 'backwards';
+                    else if (this._currentDirection === 'backwards' && next === this._currentPointIdx + 1)
+                        direction = 'forwards';
+                }
+                else {
+                    if (this._currentDirection === 'forwards' && next === this._currentPointIdx - 1)
+                        direction = 'backwards';
+                    else if (this._currentDirection === 'backwards' && next === this._currentPointIdx + 1)
+                        direction = 'UNDEFINED, THIS SHOULD NEVER HAPPEN!!!';
+                }
+
+                this._currentPointIdx = next;
+                return true;
+            }
+            
+            this._currentPointIdx = -1;
+            return false;
+        }
+
+        this._currentPointIdx = next;
+        return !(next === null || next < 0 || next >= this._points.length);
     },
     // Updates current point to the previous one, based on current direction and 
     // "loop" and "backAndForth" properties. Returns "false" when it's reached
     // the end of the route, and "true" otherwise.
-    moveBackwards: function() {
-        this._currentPointIdx = this._previousPointIdx();
-        return !(this._currentPointIdx < 0 || this._currentPointIdx === 'null');
+    moveToPrevious: function() {
+        this.changeDir();
+        var success = this.moveToNext();
+        this.changeDir();
+        return success;
+    },
+    // Changes direction: if it's going forwards, it'll go backwards and
+    // viceversa.
+    changeDir: function() {
+        if (this._currentDirection === 'forwards')
+            this._currentDirection = 'backwards';
+        else if (this._currentDirection === 'backwards')
+            this._currentDirection = 'forwards';
     },
     // Adds an additional point to the end of the route.
     addPoint: function(point) {
         this._points.push(point);
         if (this._currentPointIdx < 0)
-            this._currentPointIdx = 0
+            this._currentPointIdx = 0;
     },
     // TO DO (not used yet): removePoint()
     removePoint: function() {
@@ -67,16 +103,30 @@ var TILEDMapClass = Class.extend({
     // Returns the index of the next point of the route, based on current
     // direction and "loop" and "backAndForth" properties. 
     _nextPointIdx: function() {
-        if (this._currentPointIdx < 0)
+        // Special case (1/2): _points has 0 elements:
+        if (this._currentPointIdx < 0 || this._points.length <= 0)
             return -1;
-        
+
+        // Special case (2/2): _points has just 1 element:
+        if (this._points.length === 1)
+            return (this.loop ? 0 : -1);
+
+        // _points has, at least, 2 elements
         if (this.loop) {
             if (this.backAndForth) {
                 if (this._currentDirection === 'forwards') {
-                    
+                    pIdx = this._currentPointIdx + 1;
+
+                    if (pIdx >= this._points.length)
+                        return this._currentPointIdx - 1;
+                    return pIdx;
                 }
                 else {
+                    pIdx = this._currentPointIdx - 1;
 
+                    if (pIdx < 0)
+                        return this._currentPointIdx + 1;
+                    return pIdx;
                 }
             }
             else {
@@ -88,20 +138,31 @@ var TILEDMapClass = Class.extend({
         }
         else {
             if (this.backAndForth) {
+                var pIdx = -1;
+
                 if (this._currentDirection === 'forwards') {
-                    
+                    pIdx = this._currentPointIdx + 1;
+
+                    if (pIdx >= this._points.length)
+                        return this._currentPointIdx - 1;
+                    return pIdx;
                 }
                 else {
+                    pIdx = this._currentPointIdx - 1;
 
+                    if (pIdx < 0)
+                        return -1;
+                    return pIdx;
                 }
             }
             else {
                 var pIdx = -1;
+
                 if (this._currentDirection === 'forwards')
                     pIdx = this._currentPointIdx + 1;
                 else
                     pIdx = this._currentPointIdx - 1;
-                
+
                 if (pIdx < 0 || pIdx >= this._points.length)
                     return -1;
                 return pIdx;
@@ -113,14 +174,22 @@ var TILEDMapClass = Class.extend({
     _previousPointIdx: function() {
         if (this._currentPointIdx < 0)
             return -1;
-        
+
         if (this.loop) {
             if (this.backAndForth) {
                 if (this._currentDirection === 'forwards') {
-                    
+                    pIdx = this._currentPointIdx - 1;
+
+                    if (pIdx < 0)
+                        return this._currentPointIdx + 1;
+                    return pIdx;
                 }
                 else {
+                    pIdx = this._currentPointIdx + 1;
 
+                    if (pIdx >= this._points.length)
+                        return this._currentPointIdx - 1;
+                    return pIdx;
                 }
             }
             else {
@@ -132,11 +201,21 @@ var TILEDMapClass = Class.extend({
         }
         else {
             if (this.backAndForth) {
+                var pIdx = -1;
+
                 if (this._currentDirection === 'forwards') {
-                    
+                    pIdx = this._currentPointIdx - 1;
+
+                    if (pIdx < 0)
+                        return -1;
+                    return pIdx;
                 }
                 else {
+                    pIdx = this._currentPointIdx + 1;
 
+                    if (pIdx >= this._points.length)
+                        return this._currentPointIdx - 1;
+                    return pIdx;
                 }
             }
             else {
@@ -145,7 +224,7 @@ var TILEDMapClass = Class.extend({
                     pIdx = this._currentPointIdx - 1;
                 else
                     pIdx = this._currentPointIdx + 1;
-                
+
                 if (pIdx < 0 || pIdx >= this._points.length)
                     return -1;
                 return pIdx;
