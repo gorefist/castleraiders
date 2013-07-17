@@ -95,4 +95,10 @@ function toPixels(meters, scale) {
 function toMeters(pixels, scale) {
     return pixels * 0.02 / (scale ? scale : PIXEL_METER_SCALE ? PIXEL_METER_SCALE : 1.0);
 }
-        
+
+// Custom assert function for unit testing.
+function assert(condition, message) {
+    if (!condition) {
+        throw message || "Assertion failed";
+    }
+}

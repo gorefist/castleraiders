@@ -2,17 +2,18 @@
 // Represent a route or path to follow by an entity, point by point. It is used
 // mainly for enemies' walking around. Can be used either for 2D or 3D points.
 
-var TILEDMapClass = Class.extend({
+var AiRouteClass = Class.extend({
     _points: [],
     loop: true,
     backAndForth: false,
     _currentPointIdx: -1,
     _currentDirection: 'forwards', // 'forwards' | 'backwards'
     init: function(loop, backAndForth) {
-        if (loop)
-            this.loop = loop;
-        if (backAndForth)
-            this.backAndForth = backAndForth;
+
+        this.loop = loop;
+
+        this.backAndForth = backAndForth;
+
     },
     // Returns the current point of the route
     currentPoint: function() {
@@ -49,24 +50,25 @@ var TILEDMapClass = Class.extend({
 
         //Update direction if necessary (only if "backAndForth" === true):
         if (this.backAndForth) {
-            if (next && next >= 0 && next < this._points.length) {
+            if (next !== null && next >= 0 && next < this._points.length) {
+                
                 if (this.loop) {
                     if (this._currentDirection === 'forwards' && next === this._currentPointIdx - 1)
-                        direction = 'backwards';
+                        this._currentDirection = 'backwards';
                     else if (this._currentDirection === 'backwards' && next === this._currentPointIdx + 1)
-                        direction = 'forwards';
+                        this._currentDirection = 'forwards';
                 }
                 else {
                     if (this._currentDirection === 'forwards' && next === this._currentPointIdx - 1)
-                        direction = 'backwards';
+                        this._currentDirection = 'backwards';
                     else if (this._currentDirection === 'backwards' && next === this._currentPointIdx + 1)
-                        direction = 'UNDEFINED, THIS SHOULD NEVER HAPPEN!!!';
+                        this._currentDirection = 'UNDEFINED, THIS SHOULD NEVER HAPPEN!!!';
                 }
 
                 this._currentPointIdx = next;
                 return true;
             }
-            
+
             this._currentPointIdx = -1;
             return false;
         }
@@ -99,6 +101,14 @@ var TILEDMapClass = Class.extend({
     },
     // TO DO (not used yet): removePoint()
     removePoint: function() {
+    },
+    // Resets current point to 1st element, if any. Also, resets direction to
+    // "forwards".
+    reset: function() {
+        this._currentDirection = 'forwards';
+        
+        if (this._points.length > 0)
+            this._currentPointIdx = 0;
     },
     // Returns the index of the next point of the route, based on current
     // direction and "loop" and "backAndForth" properties. 
@@ -172,63 +182,9 @@ var TILEDMapClass = Class.extend({
     // Returns the index of the previous point of the route, based on current
     // direction and "loop" and "backAndForth" properties. 
     _previousPointIdx: function() {
-        if (this._currentPointIdx < 0)
-            return -1;
-
-        if (this.loop) {
-            if (this.backAndForth) {
-                if (this._currentDirection === 'forwards') {
-                    pIdx = this._currentPointIdx - 1;
-
-                    if (pIdx < 0)
-                        return this._currentPointIdx + 1;
-                    return pIdx;
-                }
-                else {
-                    pIdx = this._currentPointIdx + 1;
-
-                    if (pIdx >= this._points.length)
-                        return this._currentPointIdx - 1;
-                    return pIdx;
-                }
-            }
-            else {
-                if (this._currentDirection === 'forwards')
-                    return (this._currentPointIdx - 1 < 0 ? this._points.length - 1 : this._currentPointIdx - 1);
-                else
-                    return ((this._currentPointIdx + 1) % this._points.length);
-            }
-        }
-        else {
-            if (this.backAndForth) {
-                var pIdx = -1;
-
-                if (this._currentDirection === 'forwards') {
-                    pIdx = this._currentPointIdx - 1;
-
-                    if (pIdx < 0)
-                        return -1;
-                    return pIdx;
-                }
-                else {
-                    pIdx = this._currentPointIdx + 1;
-
-                    if (pIdx >= this._points.length)
-                        return this._currentPointIdx - 1;
-                    return pIdx;
-                }
-            }
-            else {
-                var pIdx = -1;
-                if (this._currentDirection === 'forwards')
-                    pIdx = this._currentPointIdx - 1;
-                else
-                    pIdx = this._currentPointIdx + 1;
-
-                if (pIdx < 0 || pIdx >= this._points.length)
-                    return -1;
-                return pIdx;
-            }
-        }
+        this.changeDir();
+        var idx = this._nextPointIdx();
+        this.changeDir();
+        return idx;
     }
 });
