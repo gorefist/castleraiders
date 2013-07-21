@@ -49,14 +49,8 @@ InputEngineClass = Class.extend({
     },
     //-----------------------------
     onMouseMove: function(event) {
-        
-        
-        //apply viewPoint translation
-        var v = gGameEngine.calculateViewPointTranslation();
-                
-        
-        gInputEngine.mouse.x = event.clientX - v.x;
-        gInputEngine.mouse.y = event.clientY - v.y;
+        gInputEngine.mouse.x = event.clientX;
+        gInputEngine.mouse.y = event.clientY;
     },
     //-----------------------------
     onKeyDown: function(event) {

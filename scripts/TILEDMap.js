@@ -2,7 +2,7 @@
 // This is based on the same file from Udacity course, 
 // with some modifications which are commented properly, if any.
 
-var TILEDMapClass = Class.extend({
+TILEDMapClass = Class.extend({
     // This is where we store the full parsed
     // JSON of the map.json file.
     currMapData: null,
@@ -276,6 +276,14 @@ var TILEDMapClass = Class.extend({
         return this.numYTiles * this.tileSize.y;
     },
     readMetadata: function() {
+        var routes = {}; // Here I'll be storing the routes as I go through all
+        // map metadata, and in the end I'll bind them to their owner enemies.
+        var enemies = {}; // Here I'll be storing the enemies.
+
+        // For both vars, "routes" and "enemies", the property "route" will be
+        // used as key. This property is stored within the obj extracted from
+        // map metadata.
+
         // [Sergio D. Jubera]
         // Now we need to read layers of a special type, 'objectgroup', used
         // for collisions, entity spawn, etc.
@@ -297,29 +305,43 @@ var TILEDMapClass = Class.extend({
                         var obj = lyr.objects[i];
 
                         if (obj.name === 'soldier') {
-                            gGameEngine.spawnSoldier('soldier',
+                            var ent = gGameEngine.spawnSoldier('soldier',
                                     {x: obj.x, y: obj.y},
-                                    SOLDIER_SIZE,
+                            SOLDIER_SIZE,
                                     obj.type,
-                                    obj.properties ? obj.properties.name : null,
-                                    obj.properties ? obj.properties.maxHP : null,
-                                    obj.properties ? obj.properties.damage : null,
-                                    obj.properties ? obj.properties.faceAngle : null);
-//                            console.log("Spawn" + 
-//                                    (obj.type? (" " + obj.type + " "): "") +
-//                                    "soldier: " +
-//                                    (obj.properties ? obj.properties.name : null) + "," +
-//                                    (obj.properties ? obj.properties.maxHP : null) + "," +
-//                                    (obj.properties ? obj.properties.damage : null));
+                                    obj.properties.name ? obj.properties.name : null,
+                                    obj.properties.maxHP ? obj.properties.maxHP : null,
+                                    obj.properties.damage ? obj.properties.damage : null,
+                                    obj.properties.faceAngle ? obj.properties.faceAngle : null,
+                                    obj.properties.speed ? obj.properties.speed : obj.type === 'skeleton' ? DEFAULT_WALKING_VELOCITY * 0.3 : DEFAULT_WALKING_VELOCITY);
+                            if (ent.soldierType === 'skeleton' && obj.properties && obj.properties.route)
+                                enemies[obj.properties.route] = ent;
                         }
                         else if (obj.name === 'chest' || obj.name === 'heart')
                             gGameEngine.spawnItem(obj.name, {x: obj.x, y: obj.y}, obj.properties ? obj.properties.value : null);
                     }
                 }
-                else if (lyr.name == 'route') {
+                else if (lyr.name == 'routes') {
+                    for (var i = 0; i < lyr.objects.length; i++) {
+                        var parsedObj = lyr.objects[i];
+                        var routeObj = new AiRouteClass(
+                                parsedObj.properties.loop,
+                                parsedObj.properties.backAndForth
+                                );
+
+                        for (var p = 0; p < parsedObj.polyline.length; p++) {
+                            routeObj.addPoint(new Vec2(parsedObj.x + parsedObj.polyline[p].x, parsedObj.y + parsedObj.polyline[p].y));
+                        }
+
+                        routes[parsedObj.name] = routeObj;
+                    }
                 }
             }
         }
+
+        // Now I've read all metadata, I can bind routes to enemies:
+        for (var ent in enemies)
+            enemies[ent].ai.route = routes[ent];
 
         // create map bounds
         var boundsThickness = 100; // thickness (in px) for the phys bodies to limit the map

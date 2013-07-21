@@ -92,7 +92,7 @@ GameEngineClass = Class.extend({
     //-----------------------------
     setup: function() {
 
-// Create physics engine
+        // Create physics engine
         gPhysicsEngine.create();
         // Set up entities collision response structure
         gPhysicsEngine.addContactListener({
@@ -120,8 +120,8 @@ GameEngineClass = Class.extend({
     // [Sergio D. Jubera]
     // I needed different params for soldiers (skeletons/humans) than for items
     // (hearts/chests) so I splitted 'spawnEntity' into the followings:
-    spawnSoldier: function(typename, pos, size, soldierType, name, maxHitPoints, damage, faceAngle) {
-        var ent = new (gGameEngine.factory[typename])(pos, size, soldierType, name, maxHitPoints, damage, faceAngle);
+    spawnSoldier: function(typename, pos, size, soldierType, name, maxHitPoints, damage, faceAngle, speed) {
+        var ent = new (gGameEngine.factory[typename])(pos, size, soldierType, name, maxHitPoints, damage, faceAngle, speed);
         gGameEngine.entities.push(ent);
         return ent;
     },
@@ -149,6 +149,7 @@ GameEngineClass = Class.extend({
         while (this.timeSinceLastUpdate >= GAME_LOOP_HZ) {
             this.update();
             this.updatePhysics();
+            gAiEngine.update();
             this.timeSinceLastUpdate -= GAME_LOOP_HZ;
         }
 
@@ -175,16 +176,18 @@ GameEngineClass = Class.extend({
         // Otherwise, push that entity onto the '_deferredKill'
         // list defined above.
 
+        // The index of the currentSoldier is going to decrease, it must be
+        // updated:
+        var currentSoldierIdxUpdate = 0;
+
         for (var i = 0; i < gGameEngine.entities.length; i++) {
             var ent = gGameEngine.entities[i];
             if (!ent._killed)
                 ent.update();
             else {
                 gGameEngine._deferredKill.push(ent);
-                if (i <= gGameEngine._currentSoldierIdx)
-                    // The index of the currentSoldier is going to decrease,
-                    // it must be updated:
-                    gGameEngine._currentSoldierIdx = gGameEngine._currentSoldierIdx - 1 < 0 ? gGameEngine.entities.length - 1 : gGameEngine._currentSoldierIdx - 1;
+                if (i < gGameEngine._currentSoldierIdx)
+                    currentSoldierIdxUpdate++;
             }
         }
 
@@ -202,12 +205,18 @@ GameEngineClass = Class.extend({
         }
 
         gGameEngine._deferredKill = [];
+        gGameEngine._currentSoldierIdx = gGameEngine._currentSoldierIdx - currentSoldierIdxUpdate < 0 ?
+                gGameEngine.entities.length - currentSoldierIdxUpdate + gGameEngine._currentSoldierIdx :
+                gGameEngine._currentSoldierIdx - currentSoldierIdxUpdate;
+        
+        // TO DO: check if there's at least one human, or game is over (lose)
+        if (gGameEngine.currentSoldier().soldierType !== 'human')
+            gGameEngine.nextSoldier();
+        
         // [Sergio D. Jubera]
         // The following is based on the GRITS code
 
         // 3. Apply Inputs
-        // TO DO: move this to update any soldier
-
         for (var i = 0; i < gGameEngine.entities.length; i++) {
             var ent = gGameEngine.entities[i];
             if (ent instanceof SoldierClass)
@@ -220,21 +229,20 @@ GameEngineClass = Class.extend({
         // This has to be after apply inputs, so that we can update the physics
         // engine between them (different calls)
 
-        var inputInfo = {
-            move_dir: new Vec2(0, 0),
-            faceAngle0to3: 0, // Limited to 4 directions
-            walking: false,
-            fire0: false,
-            //fire1: false,
-            //fire2: false
-        };
+        var inputInfo = new InputInfoClass();
 
         // Looking direction (based on mouse position):
         // this is based on lesson "Input", chapter "Quantize" of the Udacity
         // course, but I'm using just 4 directions: up, down, left & right
         // (the graphics I'm using include those 4 variations for the
         // characters, only.
-        var look_dir = new Vec2(gInputEngine.mouse.x - gGameEngine.currentSoldier().pos.x, gInputEngine.mouse.y - gGameEngine.currentSoldier().pos.y);
+        //apply viewPoint translation
+        var v = gGameEngine.calculateViewPointTranslation();
+
+        var mouseX = gInputEngine.mouse.x - v.x;
+        var mouseY = gInputEngine.mouse.y - v.y;
+        
+        var look_dir = new Vec2(mouseX - gGameEngine.currentSoldier().pos.x, mouseY - gGameEngine.currentSoldier().pos.y);
         inputInfo.faceAngle0to3 = quantizeAngle(look_dir, 4);
 
         // Change focus to next soldier

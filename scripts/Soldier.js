@@ -34,8 +34,8 @@ SoldierClass = EntityClass.extend({
     },
     animations: {}, // dictionary for all animations, "currentState" will be
     // used as key
-
-    init: function(pos, size, soldierType, name, maxHitPoints, damage, faceAngle) {
+    ai: null, // automaton controlling character's AI
+    init: function(pos, size, soldierType, name, maxHitPoints, damage, faceAngle, speed) {
         this.parent(pos, size);
         this.soldierType = soldierType;
         if (name)
@@ -47,9 +47,11 @@ SoldierClass = EntityClass.extend({
             this.damagePoints = damage;
         if (faceAngle)
             this.currentState.dir = isNaN(faceAngle) ? faceAngle : faceAngleToString(faceAngle);
+        if (speed)
+            this.speed = speed;
         this.setUpPhysics('dynamic');
         this._setupAnimations();
-        //console.log(this.hitPoints + "/" + this.maxHitPoints);
+        this._setupAI()
     },
     animate: function() {
         var currentFrame = this._currentAnim().currentFrame;
@@ -84,7 +86,7 @@ SoldierClass = EntityClass.extend({
 
             if (this.inputInfo.fire0)
                 this._attack();
-            
+
             //DO NOT FORGET to clear inputInfo!!!
             this.inputInfo = null;
         }
@@ -243,11 +245,16 @@ SoldierClass = EntityClass.extend({
         {
             //gPhysicsEngine.removeBody(this.physBody); // moved it to gGameEngine.update(), when all killed entities are effectively destroyed (step 2)
             this._killed = true;
-            var effectName = this.soldierType === 'skeleton' ? 'skeleton_die' : 'human_die';
+            var effectName = this.soldierType + '_die';
             gGameEngine.spawnEffect('instancedEffect', this.pos, effectName, false);
         }
         // else
         // TO DO: add a visual for damage effect
+    },
+    _setupAI: function() {
+        this.ai = new (gAiEngine.factory[this.soldierType])(this);
+        gAiEngine.registerRobot(this.ai);
     }
 });
+
 gGameEngine.factory['soldier'] = SoldierClass;

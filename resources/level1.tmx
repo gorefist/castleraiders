@@ -143,9 +143,16 @@
  </objectgroup>
  <objectgroup name="routes" width="70" height="70">
   <object name="doorWatch1" x="1860" y="460">
+   <properties>
+    <property name="backAndForth" value="true"/>
+   </properties>
    <polyline points="0,0 -1,278"/>
   </object>
   <object name="doorWatch2" x="1859" y="740">
+   <properties>
+    <property name="backAndForth" value="true"/>
+    <property name="loop" value="true"/>
+   </properties>
    <polyline points="0,0 -1,278"/>
   </object>
   <object name="bossWalk" x="148" y="224">

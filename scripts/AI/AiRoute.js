@@ -1,18 +1,19 @@
 // [Sergio D. Jubera]
-// Represent a route or path to follow by an entity, point by point. It is used
+// Represents a route or path to follow by an entity, point by point. It is used
 // mainly for enemies' walking around. Can be used either for 2D or 3D points.
 
-var AiRouteClass = Class.extend({
+AiRouteClass = Class.extend({
     _points: [],
     loop: true,
     backAndForth: false,
     _currentPointIdx: -1,
     _currentDirection: 'forwards', // 'forwards' | 'backwards'
     init: function(loop, backAndForth) {
+        if (typeof loop !== 'undefined' && loop !== null)
+            this.loop = loop;
 
-        this.loop = loop;
-
-        this.backAndForth = backAndForth;
+        if (typeof backAndForth !== 'undefined' && backAndForth !== null)
+            this.backAndForth = backAndForth;
 
     },
     // Returns the current point of the route
@@ -51,7 +52,7 @@ var AiRouteClass = Class.extend({
         //Update direction if necessary (only if "backAndForth" === true):
         if (this.backAndForth) {
             if (next !== null && next >= 0 && next < this._points.length) {
-                
+
                 if (this.loop) {
                     if (this._currentDirection === 'forwards' && next === this._currentPointIdx - 1)
                         this._currentDirection = 'backwards';
@@ -106,7 +107,7 @@ var AiRouteClass = Class.extend({
     // "forwards".
     reset: function() {
         this._currentDirection = 'forwards';
-        
+
         if (this._points.length > 0)
             this._currentPointIdx = 0;
     },

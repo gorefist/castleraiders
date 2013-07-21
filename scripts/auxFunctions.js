@@ -102,3 +102,8 @@ function assert(condition, message) {
         throw message || "Assertion failed";
     }
 }
+
+// Gets the distance between 2 points in the plane.
+function distance(p1, p2) {
+    return (new Vec2(p2.x - p1.x, p2.y - p1.y)).Length();
+}

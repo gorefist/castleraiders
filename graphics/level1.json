@@ -756,7 +756,7 @@
                         }],
                  "properties":
                     {
-
+                     "backAndForth":"true"
                     },
                  "type":"",
                  "visible":true,
@@ -778,7 +778,8 @@
                         }],
                  "properties":
                     {
-
+                     "backAndForth":"true",
+                     "loop":"true"
                     },
                  "type":"",
                  "visible":true,

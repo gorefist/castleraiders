@@ -50,11 +50,6 @@ PhysicsEngineClass = Class.extend({
         gPhysicsEngine.world.SetContactListener(listener);
     },
     //-----------------------------------------
-    registerBody: function(bodyDef) {
-        var body = gPhysicsEngine.world.CreateBody(bodyDef);
-        return body;
-    },
-    //-----------------------------------------
     addBody: function(entityDef) {
         var bodyDef = new BodyDef();
         bodyDef.userData = entityDef.userData; // application specific body
@@ -67,7 +62,7 @@ PhysicsEngineClass = Class.extend({
         //bodyDef.allowSleep = false;
         if (entityDef.damping)
             bodyDef.linearDamping = entityDef.damping;
-        var body = gPhysicsEngine.registerBody(bodyDef);
+        var body = gPhysicsEngine._registerBody(bodyDef);
         var fixtureDefinition = new FixtureDef();
         if (entityDef.useBouncyFixture) {
             fixtureDefinition.density = 1.0;
@@ -140,6 +135,11 @@ PhysicsEngineClass = Class.extend({
                 physBody = physBody.GetNext();
             }
         }
+    },
+    //-----------------------------------------
+    _registerBody: function(bodyDef) {
+        var body = gPhysicsEngine.world.CreateBody(bodyDef);
+        return body;
     }
 });
 var gPhysicsEngine = new PhysicsEngineClass();
