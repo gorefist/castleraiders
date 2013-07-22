@@ -12,7 +12,7 @@ AnimationClass = Class.extend({
     currentFrame: 0.0,
     loop: true,
     speed: DEFAULT_ANIM_SPEED, //allows different animations to flow at different pace
-    offset: { x: 0, y: 0 },
+    offset: {x: 0, y: 0},
     init: function(animOffset)
     {
         if (animOffset)
@@ -24,8 +24,9 @@ AnimationClass = Class.extend({
     draw: function(x, y)
     {
         var frame = this.frames[Math.floor(this.currentFrame)];
-
-        drawSprite(frame.id, x + this.offset.x, y + this.offset.y);
+        
+        if (isInsideViewPort({x: x + this.offset.x, y: y + this.offset.y}, {w: frame.w, h: frame.h}))
+            drawSprite(frame.id, x + this.offset.x, y + this.offset.y);
     },
     animate: function()
     {

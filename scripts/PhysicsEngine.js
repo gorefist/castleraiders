@@ -41,12 +41,24 @@ PhysicsEngineClass = Class.extend({
     //-----------------------------------------
     addContactListener: function(callbacks) {
         var listener = new Box2D.Dynamics.b2ContactListener();
+
+        if (callbacks.BeginContact)
+            listener.BeginContact = function(contact) {
+                callbacks.BeginContact(contact.GetFixtureA().GetBody(),
+                        contact.GetFixtureB().GetBody());
+            }
+        if (callbacks.EndContact)
+            listener.EndContact = function(contact) {
+                callbacks.EndContact(contact.GetFixtureA().GetBody(),
+                        contact.GetFixtureB().GetBody());
+            }
         if (callbacks.PostSolve)
             listener.PostSolve = function(contact, impulse) {
                 callbacks.PostSolve(contact.GetFixtureA().GetBody(),
                         contact.GetFixtureB().GetBody(),
                         impulse.normalImpulses[0]);
             };
+
         gPhysicsEngine.world.SetContactListener(listener);
     },
     //-----------------------------------------
@@ -89,17 +101,13 @@ PhysicsEngineClass = Class.extend({
     drawBodies: function() {
         if (DEBUG_SHOW_PHYSIC_BODIES)
         {
+            ctx.save();
+
             var physBody = this.world.GetBodyList();
             while (physBody != null) {
-
-                var physPos = {
-                    x: toPixels(physBody.GetPosition().x),
-                    y: toPixels(physBody.GetPosition().y)
-                };
-
                 var fixture = physBody.GetFixtureList();
 
-                if (fixture != null) {
+                while (fixture !== null) {
 
                     var physBounds = {
                         lowerBound: fixture.GetAABB().lowerBound,
@@ -115,7 +123,17 @@ PhysicsEngineClass = Class.extend({
                             toPixels(physBounds.upperBound.y - physBounds.lowerBound.y)
                             );
                     ctx.lineWidth = 2;
-                    ctx.strokeStyle = 'red';
+                    ctx.globalAlpha = 0.35;
+                    if (fixture.IsSensor()) {
+                        ctx.fillStyle = 'purple';
+                        ctx.strokeStyle = 'purple';
+                    }
+                    else {
+                        ctx.fillStyle = 'red';
+                        ctx.strokeStyle = 'red';
+                    }
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
                     ctx.stroke();
                     // Draw physic body type (for debug)
                     var textToDisplay = "type=" + (physBody.GetType() === Body.b2_staticBody ? 'static' : physBody.GetType() === Body.b2_dynamicBody ? 'dynamic' : 'unknown body type');
@@ -131,9 +149,12 @@ PhysicsEngineClass = Class.extend({
                             textToDisplay,
                             toPixels(physBounds.upperBound.x),
                             toPixels(physBounds.upperBound.y));
+
+                    fixture = fixture.GetNext();
                 }
                 physBody = physBody.GetNext();
             }
+            ctx.restore();
         }
     },
     //-----------------------------------------

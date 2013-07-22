@@ -73,6 +73,12 @@ ChestItemClass = EntityClass.extend({
         this._killed = true;
 
         // TO DO: add a visual for damage effect
+    },
+    setUpPhysics: function(bodyType) {
+        this.parent(bodyType);
+        var fixture = this.physBody.GetFixtureList();
+        if (fixture)
+            fixture.SetSensor(true);
     }
 });
 

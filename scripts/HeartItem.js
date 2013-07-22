@@ -45,7 +45,7 @@ HeartItemClass = EntityClass.extend({
     },
     draw: function()
     {
-// Draw item value
+        // Draw item value
         if (SHOW_VALUE_ITEMS)
         {
             ctx.font = "bold 10px sans-serif";
@@ -67,6 +67,12 @@ HeartItemClass = EntityClass.extend({
         //gPhysicsEngine.removeBody(this.physBody); // this fails here for static objects, I moved it to gGameEngine.update(), when all killed entities are effectively destroyed (step 2)
         this._killed = true;
         // TO DO: add a visual for damage effect
+    },
+    setUpPhysics: function(bodyType) {
+        this.parent(bodyType);
+        var fixture = this.physBody.GetFixtureList();
+        if (fixture)
+            fixture.SetSensor(true);
     }
 });
 gGameEngine.factory['heart'] = HeartItemClass;

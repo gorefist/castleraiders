@@ -11,7 +11,9 @@ var LIFE_BAR_CAP = "round"; // style of life bar ends
 var LOW_HP = 0.2; // percentage of HP considered low
 var MED_HP = 0.6; // percentage of HP considered medium
 var SOLDIER_ANIM_OFFSET = {x: 0, y: -16}; // Needed for the pseudo-3D effect
-var SOLDIER_SIZE = {w: 26, h: 30};
+var SOLDIER_SIZE = {w: 26, h: 30};  // size of the physic body
+var ATTACK_RANGE = 10; // attack area, in pixels. This will be used to calculte
+// the size of the attack physic body sensors.
 SoldierClass = EntityClass.extend({
     actions: ['stop', 'walk', 'attack'],
     directions: ['up', 'down', 'left', 'right'],
@@ -101,8 +103,8 @@ SoldierClass = EntityClass.extend({
         if ((this.soldierType === 'human' && SHOW_LIFE_BAR_HUMANS) ||
                 (this.soldierType === 'skeleton' && SHOW_LIFE_BAR_SKELETONS))
         {
-            var minX = this.pos.x - (LIFE_BAR_LENGTH / 2);
-            var maxX = this.pos.x + (LIFE_BAR_LENGTH / 2);
+            var minX = this.pos.x - (LIFE_BAR_LENGTH * 0.5);
+            var maxX = this.pos.x + (LIFE_BAR_LENGTH * 0.5);
             var percentHP = Math.max(this.hitPoints, 0) / this.maxHitPoints;
             var Y = this.pos.y + LIFE_BAR_OFFSET + SOLDIER_ANIM_OFFSET.y;
 
@@ -201,8 +203,6 @@ SoldierClass = EntityClass.extend({
     // Function callback for collisions. For this game, point and impulse are
     // not necessary.
     onTouch: function(otherBody, point, impulse) {
-
-
         var otherEnt = otherBody.GetDefinition().userData.ent;
         if (!this._killed && !otherEnt._killed)
         {

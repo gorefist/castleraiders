@@ -50,7 +50,8 @@ InstancedEffectClass = EntityClass.extend({
     draw: function()
     {
         this.animation.draw(this.pos.x, this.pos.y);
-
+    },
+    update: function() {
         // Animate if it hasn't finished yet
         if (!this._finished)
         {
@@ -64,10 +65,9 @@ InstancedEffectClass = EntityClass.extend({
         }
         else if (this.removeWhenFinished)
         {
-            // TO DO: Remove from gGameEngine.entities
+            this._killed = true;
         }
-
-    },
+    }
 });
 
 gGameEngine.factory['instancedEffect'] = InstancedEffectClass;

@@ -107,3 +107,35 @@ function assert(condition, message) {
 function distance(p1, p2) {
     return (new Vec2(p2.x - p1.x, p2.y - p1.y)).Length();
 }
+
+// Calculates the translation vector (from currentSoldier to default view 
+// point). This will be applied to canvas context to center the view port in
+// current soldier (under user's control).
+function calculateViewPortTranslation()
+{
+    // TO DO: check if canvas size is greater than map size
+    var translation = new Vec2(
+            canvas.width * 0.5 - gGameEngine.currentSoldier().pos.x,
+            canvas.height * 0.5 - gGameEngine.currentSoldier().pos.y);
+    //Make sure it doesn't go beyond map bounds
+    if (gGameEngine.currentSoldier().pos.x < (canvas.width * 0.5))
+        translation.x = 0;
+    else if (gGameEngine.currentSoldier().pos.x > (gMap.width() - canvas.width * 0.5))
+        translation.x = canvas.width * 0.5 - (gMap.width() - canvas.width * 0.5);
+    if (gGameEngine.currentSoldier().pos.y < (canvas.height * 0.5))
+        translation.y = 0;
+    else if (gGameEngine.currentSoldier().pos.y > (gMap.height() - canvas.height * 0.5))
+        translation.y = canvas.height * 0.5 - (gMap.height() - canvas.height * 0.5);
+    return translation;
+}
+
+// Calculates if an element is visible. This function is used to avoid wasting
+// time in calculations and drawings of things outside the current view port.
+function isInsideViewPort(pos, size) {
+    var trV = calculateViewPortTranslation();
+    
+    return !(((pos.x + size.w * 0.5 + trV.x) < 0) ||
+            ((pos.x - size.w * 0.5 + trV.x) > canvas.width) ||
+            ((pos.y + size.h * 0.5 + trV.y) < 0) ||
+            ((pos.y - size.h * 0.5 + trV.y) > canvas.height));
+}

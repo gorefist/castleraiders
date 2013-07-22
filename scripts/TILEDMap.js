@@ -49,9 +49,11 @@ TILEDMapClass = Class.extend({
     // Boolean flag we set once our tile images
     // has finished loading.
     fullyLoaded: false,
-    foregroundLayer: null, // [Sergio D. Jubera] This layer is special, it must
+    // [Sergio D. Jubera] The following 3 attributes are used to enhance layer drawing:
+    foregroundLayer: null, // This layer is special, it must
     // be drawn apart from the other layers.
-    backgroundLayer: null, // [Sergio D. Jubera] The same for the background.
+    backgroundLayer: null, // The same for the background.
+    middleLayers: [], // The rest of the layers.
     //-----------------------------------------
     // Load the json file at the url 'map' into
     // memory. This is similar to the requests
@@ -230,32 +232,13 @@ TILEDMapClass = Class.extend({
     drawElements: function(ctx) {
         // First, we need to check if the map data has
         // already finished loading...
-        if (!gMap.fullyLoaded)
+        if (!this.fullyLoaded)
             return;
 
         // ...Now, for every single layer in the 'layers' Array
         // of 'currMapData'...
-        for (var layerIdx = 0; layerIdx < gMap.currMapData.layers.length; layerIdx++) {
-            // Check if the 'type' of the layer is "tilelayer". If it isn't, we don't
-            // care about drawing it...
-            if (gMap.currMapData.layers[layerIdx].type !== "tilelayer"
-                    || !gMap.currMapData.layers[layerIdx].visible) // [Sergio D. Jubera] don't draw if it's hidden
-                continue;
-
-            // [Sergio D. Jubera] foreground layer must be drawn separately:
-            if (gMap.currMapData.layers[layerIdx].name === 'foreground') {
-                gMap.foregroundLayer = gMap.currMapData.layers[layerIdx];
-                continue;
-            }
-
-            // [Sergio D. Jubera] the same for the background:
-            if (gMap.currMapData.layers[layerIdx].name === 'background') {
-                gMap.backgroundLayer = gMap.currMapData.layers[layerIdx];
-                continue;
-            }
-
-            this._drawLayer(gMap.currMapData.layers[layerIdx].data);
-        }
+        for (var layerIdx = 0; layerIdx < this.middleLayers.length /*gMap.currMapData.layers.length*/; layerIdx++)
+            this._drawLayer(this.middleLayers[layerIdx].data);
     },
     drawForeground: function(ctx) {
         if (!this.fullyLoaded || this.foregroundLayer === null)
@@ -337,6 +320,17 @@ TILEDMapClass = Class.extend({
                     }
                 }
             }
+            else {
+                // Store for drawing them later on.
+                if (lyr.name === 'foreground')
+                    this.foregroundLayer = lyr;
+
+                else if (lyr.name === 'background')
+                    this.backgroundLayer = lyr;
+                
+                else
+                    this.middleLayers.push(lyr);
+            }
         }
 
         // Now I've read all metadata, I can bind routes to enemies:
@@ -346,19 +340,19 @@ TILEDMapClass = Class.extend({
         // create map bounds
         var boundsThickness = 100; // thickness (in px) for the phys bodies to limit the map
         // Top
-        var ent = new EntityClass({x: this.width() / 2, y: 0 - boundsThickness * 0.5}, {w: this.width(), h: boundsThickness});
+        var ent = new EntityClass({x: this.width() * 0.5, y: 0 - boundsThickness * 0.5}, {w: this.width(), h: boundsThickness});
         ent.setUpPhysics('static');
 
         // Bottom
-        ent = new EntityClass({x: this.width() / 2, y: this.height() + boundsThickness * 0.5}, {w: this.width(), h: boundsThickness});
+        ent = new EntityClass({x: this.width() * 0.5, y: this.height() + boundsThickness * 0.5}, {w: this.width(), h: boundsThickness});
         ent.setUpPhysics('static');
 
         // Left
-        ent = new EntityClass({x: 0 - boundsThickness * 0.5, y: this.height() / 2}, {w: boundsThickness, h: this.height()});
+        ent = new EntityClass({x: 0 - boundsThickness * 0.5, y: this.height() * 0.5}, {w: boundsThickness, h: this.height()});
         ent.setUpPhysics('static');
 
         // Right
-        ent = new EntityClass({x: this.width() + boundsThickness * 0.5, y: this.height() / 2}, {w: boundsThickness, h: this.height()});
+        ent = new EntityClass({x: this.width() + boundsThickness * 0.5, y: this.height() * 0.5}, {w: boundsThickness, h: this.height()});
         ent.setUpPhysics('static');
     },
     _drawLayer: function(layerData) {
@@ -384,25 +378,29 @@ TILEDMapClass = Class.extend({
             var worldX = Math.floor(tileIDX % gMap.numXTiles) * gMap.tileSize.x;
             var worldY = Math.floor(tileIDX / gMap.numXTiles) * gMap.tileSize.y;
 
+            // TO DO: this can be improved further, calculating the indexes of
+            // the tiles inside current view port. But those calculations
+            // require to be thought carefully, so I'll leave them for later on.            
+            if (isInsideViewPort({x: worldX + gMap.tileSize.x*0.5, y: worldY + gMap.tileSize.y*0.5}, {w: gMap.tileSize.x, h: gMap.tileSize.y})) {
+                // Now, we're finally drawing the map to our canvas! The 'drawImage'
+                // method of our 'ctx' object takes nine arguments:
+                //
+                // 1) The Image object to draw,
+                // 2) The source x coordinate in our Image,
+                // 3) The source y coordinate in our Image,
+                // 4) The source width of our tile,
+                // 5) The source height of our tile,
+                // 6) The canvas x coordinate to draw to,
+                // 7) The canvas y coordinate to draw to,
+                // 8) The destination width,
+                // 9) The destination height
+                //
+                // Note that we don't want to stretch our tiles at all, so the
+                // source height and width should be the same as the destination!
+                //
 
-            // Now, we're finally drawing the map to our canvas! The 'drawImage'
-            // method of our 'ctx' object takes nine arguments:
-            //
-            // 1) The Image object to draw,
-            // 2) The source x coordinate in our Image,
-            // 3) The source y coordinate in our Image,
-            // 4) The source width of our tile,
-            // 5) The source height of our tile,
-            // 6) The canvas x coordinate to draw to,
-            // 7) The canvas y coordinate to draw to,
-            // 8) The destination width,
-            // 9) The destination height
-            //
-            // Note that we don't want to stretch our tiles at all, so the
-            // source height and width should be the same as the destination!
-            //
-
-            ctx.drawImage(tPKT.img, tPKT.px, tPKT.py, gMap.tileSize.x, gMap.tileSize.y, worldX, worldY, gMap.tileSize.x, gMap.tileSize.y);
+                ctx.drawImage(tPKT.img, tPKT.px, tPKT.py, gMap.tileSize.x, gMap.tileSize.y, worldX, worldY, gMap.tileSize.x, gMap.tileSize.y);
+            }
         }
     }
 });

@@ -5,8 +5,7 @@
 // TO DO: read debug settings from file/game options rather than hardcoding them
 // Constants for debug
 var DEBUG_SHOW_FPS = true;
-var DEBUG_SHOW_PHYSIC_BODIES = false;
-var DEBUG_SHOW_PHYSIC_SENSORS = true;   // for AI triggers & game events
+var DEBUG_SHOW_PHYSIC_BODIES = false;   // red = physic bodies, purple = sensors
 var DEBUG_SHOW_ENTITIES = false; // draws entity array and their ids
 var DEBUG_SHOW_MAP_BOUNDS = false;
 
@@ -96,19 +95,37 @@ GameEngineClass = Class.extend({
         gPhysicsEngine.create();
         // Set up entities collision response structure
         gPhysicsEngine.addContactListener({
-            PostSolve: function(bodyA, bodyB, impulse) {
+            // Needed for sensors to work, as they don't trigger the contact
+            // solver.
+            BeginContact: function(bodyA, bodyB) {
                 var uA = bodyA ? bodyA.GetUserData() : null;
                 var uB = bodyB ? bodyB.GetUserData() : null;
                 if (uA !== null) {
                     if (uA.ent !== null && uA.ent.onTouch)
-                        uA.ent.onTouch(bodyB, null, impulse);
+                        uA.ent.onTouch(bodyB, null);
                 }
 
                 if (uB !== null) {
                     if (uB.ent !== null && uB.ent.onTouch)
-                        uB.ent.onTouch(bodyA, null, impulse);
+                        uB.ent.onTouch(bodyA, null);
                 }
-            }
+            }//,
+            // This would be used in case we would like to modify bodies'
+            // trajectories based on impulse after collision, but that's not
+            // the case for this game.
+//            PostSolve: function(bodyA, bodyB, impulse) {
+//                var uA = bodyA ? bodyA.GetUserData() : null;
+//                var uB = bodyB ? bodyB.GetUserData() : null;
+//                if (uA !== null) {
+//                    if (uA.ent !== null && uA.ent.onTouch)
+//                        uA.ent.onTouch(bodyB, null, impulse);
+//                }
+//
+//                if (uB !== null) {
+//                    if (uB.ent !== null && uB.ent.onTouch)
+//                        uB.ent.onTouch(bodyA, null, impulse);
+//                }
+//            }
         });
 
         gMap.readMetadata();
@@ -159,7 +176,7 @@ GameEngineClass = Class.extend({
         // This is mine: measure FPS
         this.timeSinceLastFpsCheck += timeElapsed;
         if (this.timeSinceLastFpsCheck > 1) {
-            this.lastFps = (this.lastFps + this.frameCount) / 2;
+            this.lastFps = (this.lastFps + this.frameCount) * 0.5;
             this.timeSinceLastFpsCheck = 0;
             this.frameCount = 0;
         }
@@ -236,8 +253,8 @@ GameEngineClass = Class.extend({
         // course, but I'm using just 4 directions: up, down, left & right
         // (the graphics I'm using include those 4 variations for the
         // characters, only.
-        //apply viewPoint translation
-        var v = gGameEngine.calculateViewPointTranslation();
+        //apply ViewPort translation
+        var v = calculateViewPortTranslation();
 
         var mouseX = gInputEngine.mouse.x - v.x;
         var mouseY = gInputEngine.mouse.y - v.y;
@@ -309,7 +326,7 @@ GameEngineClass = Class.extend({
         }
     },
     // [Sergio D. Jubera]
-    // Draws the entire scene
+    // Draws the entire scene.
     draw: function()
     {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -317,7 +334,7 @@ GameEngineClass = Class.extend({
         canvas.height = window.innerHeight - 20;
         ctx.save();
         //Translate coord. systems, based on current view position
-        var trV = gGameEngine.calculateViewPointTranslation();
+        var trV = calculateViewPortTranslation();
         ctx.translate(trV.x, trV.y);
 
         // Draw map (partially)
@@ -371,27 +388,6 @@ GameEngineClass = Class.extend({
     {
         return gGameEngine.entities[gGameEngine._currentSoldierIdx];
     },
-    // [Sergio D. Jubera]
-    // Calculates the translation vector (from currentSoldier to default view 
-    // point) and applies it to canvas context to center the view/scene in
-    // current soldier (under user's control).
-    calculateViewPointTranslation: function()
-    {
-        // TO DO: check if canvas size is greater than map size
-        var translation = new Vec2(
-                canvas.width / 2 - gGameEngine.currentSoldier().pos.x,
-                canvas.height / 2 - gGameEngine.currentSoldier().pos.y);
-        //Make sure it doesn't go beyond map bounds
-        if (gGameEngine.currentSoldier().pos.x < (canvas.width / 2))
-            translation.x = 0;
-        else if (gGameEngine.currentSoldier().pos.x > (gMap.width() - canvas.width / 2))
-            translation.x = canvas.width / 2 - (gMap.width() - canvas.width / 2);
-        if (gGameEngine.currentSoldier().pos.y < (canvas.height / 2))
-            translation.y = 0;
-        else if (gGameEngine.currentSoldier().pos.y > (gMap.height() - canvas.height / 2))
-            translation.y = canvas.height / 2 - (gMap.height() - canvas.height / 2);
-        return translation;
-    },
     _drawPointer: function()
     {
         ctx.save();
@@ -441,7 +437,7 @@ GameEngineClass = Class.extend({
 
 //    ctx.fillText("Mouse: (" + gInputEngine.mouse.x + "," + gInputEngine.mouse.y + ")", 10, 10);
 //    ctx.fillText("Player: (" + gGameEngine.currentSoldier().pos.x + "," + gGameEngine.currentSoldier().pos.y + ")", 10, 20);
-//    ctx.fillText("Transl: (" + gGameEngine.calculateViewPointTranslation().x + "," + gGameEngine.calculateViewPointTranslation().y + ")", 10, 30);
+//    ctx.fillText("Transl: (" + gGameEngine.calculateViewPortTranslation().x + "," + gGameEngine.calculateViewPortTranslation().y + ")", 10, 30);
 //    ctx.fillText("Map bounds: (" + gMap.width() + "," + gMap.height() + ")", 10, 40);
 //    ctx.fillText("Canvas bounds: (" + canvas.width + "," + canvas.height + ")", 10, 50);
     },
