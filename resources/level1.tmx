@@ -27,7 +27,6 @@
   <object name="rock" x="2040" y="2682" width="38" height="37"/>
   <object name="rock" x="1641" y="2363" width="38" height="37"/>
   <object name="rock" x="2440" y="2281" width="38" height="37"/>
-  <object name="rock" x="2282" y="1242" width="33" height="28"/>
   <object name="wall" x="2" y="83" width="1812" height="37"/>
   <object name="wall" x="1800" y="83" width="28" height="519"/>
   <object name="wall" x="1" y="84" width="37" height="1422"/>
@@ -44,8 +43,7 @@
   <object name="tree" x="648" y="2498" width="63" height="56"/>
   <object name="tree" x="129" y="2256" width="63" height="56"/>
   <object name="tree" x="2647" y="2535" width="63" height="56"/>
-  <object name="rock" x="2444" y="1761" width="33" height="28"/>
-  <object name="rock" x="1043" y="2762" width="33" height="28"/>
+  <object name="rock" x="1042" y="2756" width="33" height="31"/>
   <object name="tree2" x="1479" y="2749" width="37" height="38"/>
   <object name="tree2" x="1039" y="2389" width="37" height="38"/>
   <object name="tree2" x="1161" y="2391" width="37" height="38"/>
@@ -54,6 +52,8 @@
   <object name="tree2" x="2239" y="1949" width="37" height="38"/>
   <object name="tree2" x="1959" y="2148" width="37" height="38"/>
   <object name="tree2" x="321" y="2030" width="37" height="38"/>
+  <object name="rock" x="2443" y="1755" width="33" height="31"/>
+  <object name="rock" x="2283" y="1236" width="33" height="31"/>
  </objectgroup>
  <objectgroup name="spawn" width="70" height="70">
   <object name="soldier" type="skeleton" x="1841" y="600" width="39" height="39">

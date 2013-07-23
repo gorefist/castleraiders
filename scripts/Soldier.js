@@ -11,9 +11,8 @@ var LIFE_BAR_CAP = "round"; // style of life bar ends
 var LOW_HP = 0.2; // percentage of HP considered low
 var MED_HP = 0.6; // percentage of HP considered medium
 var SOLDIER_ANIM_OFFSET = {x: 0, y: -16}; // Needed for the pseudo-3D effect
-var SOLDIER_SIZE = {w: 26, h: 30};  // size of the physic body
-var ATTACK_RANGE = 10; // attack area, in pixels. This will be used to calculte
-// the size of the attack physic body sensors.
+var SOLDIER_SIZE = {w: 26, h: 26};  // size of the physic body
+
 SoldierClass = EntityClass.extend({
     actions: ['stop', 'walk', 'attack'],
     directions: ['up', 'down', 'left', 'right'],
@@ -29,6 +28,10 @@ SoldierClass = EntityClass.extend({
     // Here I'd add other features like shield, power attack, etc.
 
     soldierType: "skeleton",
+    entitiesInAttackRange: [], // if this ent attacks, will potentially inflict
+    // damage to the entities in this array.
+    enemiesInSightRange: [], // enemies detected visually, this will be used by
+    // the AI engine.
     // The following attributes are used for animations
     currentState: {
         action: "stop",
@@ -37,7 +40,7 @@ SoldierClass = EntityClass.extend({
     animations: {}, // dictionary for all animations, "currentState" will be
     // used as key
     ai: null, // automaton controlling character's AI
-    init: function(pos, size, soldierType, name, maxHitPoints, damage, faceAngle, speed) {
+    init: function(pos, size, soldierType, name, maxHitPoints, damage, faceAngle, speed, attackRange, sightRange) {
         this.parent(pos, size);
         this.soldierType = soldierType;
         if (name)
@@ -51,7 +54,8 @@ SoldierClass = EntityClass.extend({
             this.currentState.dir = isNaN(faceAngle) ? faceAngle : faceAngleToString(faceAngle);
         if (speed)
             this.speed = speed;
-        this.setUpPhysics('dynamic');
+
+        this.setUpPhysics('dynamic', attackRange, sightRange);
         this._setupAnimations();
         this._setupAI()
     },
@@ -155,6 +159,28 @@ SoldierClass = EntityClass.extend({
     },
     _attack: function() {
         this.currentState.action = 'attack';
+
+        // Check it's the very beginning of the attack, so that damage is
+        // triggered just once. If that's the case, inflict damage to all
+        // entities in attack range and face angle:
+        if (Math.ceil(this._currentAnim().currentFrame) === 0) {
+            //console.log(this.physBody.GetUserData().id + " attacks.");
+
+            for (var i = 0; i < this.entitiesInAttackRange.length; i++) {
+                var ent = this.entitiesInAttackRange[i];
+                // check if the attacker is facing the target, using the
+                // quantized angle technique again
+                var entDir = new Vec2(ent.pos.x - this.pos.x, ent.pos.y - this.pos.y);
+                var angle0to3 = quantizeAngle(entDir, 4);
+                if (this.currentState.dir === faceAngleToString(angle0to3))
+                {
+                    if (ent.receiveDamage) {
+                        ent.receiveDamage(this.damagePoints);
+                        console.log(this.physBody.GetUserData().id + " does " + this.damagePoints + " damage points to " + ent.physBody.GetUserData().id);
+                    }
+                }
+            }
+        }
     },
     _resetAnimation: function() {
         this.animations[this.currentState.action + "_" + this.currentState.dir].reset();
@@ -200,44 +226,58 @@ SoldierClass = EntityClass.extend({
             console.log(e.stack);
         }
     },
-    // Function callback for collisions. For this game, point and impulse are
-    // not necessary.
-    onTouch: function(otherBody, point, impulse) {
-        var otherEnt = otherBody.GetDefinition().userData.ent;
-        if (!this._killed && !otherEnt._killed)
+    // Function callback for contacts/collisions.
+    onTouch: function(thisFixture, otherFixture) {
+        var otherEnt = otherFixture.GetBody().GetUserData().ent;
+        if (otherEnt && !this._killed && !otherEnt._killed)
         {
-            if (otherEnt instanceof SoldierClass)
-            {
-                // TO DO: add a physic body with .isSensor = true to the soldiers,
-                // bigger than the physic body itself, to allow attacking enemies
-                // without needing to touch them.
-
-                // Check if it's an attack
-                if (this.currentState.action === 'attack' &&
-                        (OPTIONS_FRIENDLY_FIRE || otherEnt.soldierType != this.soldierType) &&
-                        Math.ceil(this._currentAnim().currentFrame) === 0) // check it's the very beginning of the attack, so that damage is triggered just once
-                {
-                    // check if the attacker is facing the target, using the
-                    // quantized angle technique again
-                    var otherDir = new Vec2(otherEnt.pos.x - this.pos.x, otherEnt.pos.y - this.pos.y);
-                    var otherAngle0to3 = quantizeAngle(otherDir, 4);
-                    if (this.currentState.dir === faceAngleToString(otherAngle0to3))
-                    {
-                        console.log(this.physBody.GetDefinition().userData.id + " does " + this.damagePoints + " damage points to " + otherEnt.physBody.GetDefinition().userData.id);
-                        if (otherEnt.receiveDamage)
-                            otherEnt.receiveDamage(this.damagePoints);
-                    }
-                }
-            }
-            else if (this.soldierType === 'human' &&
+            // CASE 1: human (body) grabs item (sensor)
+            if (this.soldierType === 'human' &&
+                    thisFixture.GetUserData().name === 'physBody' &&
                     (otherEnt instanceof HeartItemClass || otherEnt instanceof ChestItemClass))
             {
-                console.log(this.physBody.GetDefinition().userData.id + " grabs item " + otherBody.GetDefinition().userData.id + ".");
-                otherEnt.itemEffects(this);
+                //console.log(this.physBody.GetDefinition().userData.id + " grabs item " + otherFixture.GetBody().GetUserData().id + ".");
+                if (otherEnt.itemEffects)
+                    otherEnt.itemEffects(this);
+            }
+
+            // CASE 2: soldier (sensor) detects another soldier (body) in attack or sight range
+            else if (otherEnt instanceof SoldierClass && otherFixture.GetUserData().name === 'physBody') {
+
+                // CASE 2.1: soldier entered attack area
+                if (thisFixture.GetUserData().name === 'attackSensor' &&
+                        (OPTIONS_FRIENDLY_FIRE || otherEnt.soldierType !== this.soldierType))
+                {
+                    //console.log(this.physBody.GetUserData().id + " gets " + otherEnt.physBody.GetUserData().id + " in attack range.");
+                    this.entitiesInAttackRange.push(otherEnt);
+                }
+
+                // CASE 2.2: enemy entered sight area
+                else if (thisFixture.GetUserData().name === 'sightSensor' &&
+                        otherEnt.soldierType !== this.soldierType) {
+                    //console.log(this.physBody.GetUserData().id + " gets " + otherEnt.physBody.GetUserData().id + " in sight range.");
+                    this.enemiesInSightRange.push(otherEnt);
+                }
             }
         }
 
         return true;
+    },
+    onFinishTouch: function(thisFixture, otherFixture) {
+        var otherEnt = otherFixture.GetBody().GetUserData().ent;
+        
+        if (otherEnt instanceof SoldierClass && otherFixture.GetUserData().name === 'physBody') {
+            if (thisFixture.GetUserData().name === 'attackSensor' &&
+                    (OPTIONS_FRIENDLY_FIRE || otherEnt.soldierType !== this.soldierType)) {
+                //console.log(this.physBody.GetUserData().id + " no longer has " + otherEnt.physBody.GetUserData().id + " in attack range.");
+                this.entitiesInAttackRange.erase(otherEnt);
+            }
+            else if (thisFixture.GetUserData().name === 'sightSensor' &&
+                    otherEnt.soldierType !== this.soldierType) {
+                //console.log(this.physBody.GetUserData().id + " no longer has " + otherEnt.physBody.GetUserData().id + " in sight range.");
+                this.enemiesInSightRange.erase(otherEnt);
+            }
+        }
     },
     receiveDamage: function(dmgPoints) {
         this.hitPoints -= dmgPoints;
@@ -250,6 +290,25 @@ SoldierClass = EntityClass.extend({
         }
         // else
         // TO DO: add a visual for damage effect
+    },
+    // In addition to the physic body for collisions, here I'll add some sensors
+    // which will come in handy for sight and attack range handling.
+    setUpPhysics: function(bodyType, attackRange, sightRange) {
+        this.parent(bodyType);
+
+        var attackSensor = new FixtureDef();
+        attackSensor.isSensor = true;
+        attackSensor.shape = new PolygonShape();
+        attackSensor.shape.SetAsBox(toMeters(attackRange), toMeters(attackRange));
+        attackSensor.userData = {name: 'attackSensor'};
+        this.physBody.CreateFixture(attackSensor);
+
+        var sightSensor = new FixtureDef();
+        sightSensor.isSensor = true;
+        sightSensor.shape = new PolygonShape();
+        sightSensor.shape.SetAsBox(toMeters(sightRange), toMeters(sightRange));
+        sightSensor.userData = {name: 'sightSensor'};
+        this.physBody.CreateFixture(sightSensor);
     },
     _setupAI: function() {
         this.ai = new (gAiEngine.factory[this.soldierType])(this);

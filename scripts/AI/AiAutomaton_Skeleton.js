@@ -8,17 +8,41 @@ AiAutomaton_SkeletonClass = AiAutomatonClass.extend({
     update: function() {
         switch (this._currentState) {
             case 'attack':
+                if (this._entity.enemiesInSightRange.length <= 0)
+                    this._currentState = 'idle';
+                else {
+                    if (this._entity.entitiesInAttackRange.length > 0) {
+                        //look at first enemy and attack
+                        for (var i = 0; i < this._entity.entitiesInAttackRange.length; i++) {
+                            if (this._entity.entitiesInAttackRange[i].soldierType === 'human') {
+                                this.lookAt(this._entity.entitiesInAttackRange[i].pos);
+                                this.attack();
+                                break;
+                            }
+                        }   
+                    }
+                    else {
+                        // There are enemies in sight but they're not inside
+                        // attack range, get closer:
+                        this.lookAt(this._entity.enemiesInSightRange[0].pos);
+                        this.moveTo(this._entity.enemiesInSightRange[0].pos);
+                    }
+                }
             case 'blocked':
-            case 'stop':
+                // TO DO: unblock route (THIS WILL BE QUITE A CHALLENGE!!)
                 break;
+            case 'idle':
+            case 'stop':
             default:
+                if (this._entity.enemiesInSightRange.length > 0)
+                    this._currentState = 'attack';
                 this.parent();  // just idle state (walking around)
                 break;
         }
     }
 
     /*        // Code for quick tests
-     this.look(gGameEngine.currentSoldier().pos); // look at current soldier
+     this.lookAt(gGameEngine.currentSoldier().pos); // look at current soldier
      
      if (distance(this._entity.pos, gGameEngine.currentSoldier().pos) > 100)
      this.moveTo(new Vec2(gGameEngine.currentSoldier().pos.x, gGameEngine.currentSoldier().pos.y));  // move close to current soldier

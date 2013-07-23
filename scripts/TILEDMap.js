@@ -272,9 +272,9 @@ TILEDMapClass = Class.extend({
         // for collisions, entity spawn, etc.
         for (var layerIdx = 0; layerIdx < gMap.currMapData.layers.length; layerIdx++) {
             var lyr = gMap.currMapData.layers[layerIdx];
-            if (lyr.type == "objectgroup" && lyr.visible)
+            if (lyr.type === "objectgroup" && lyr.visible)
             {
-                if (lyr.name == 'collisions') {
+                if (lyr.name === 'collisions') {
                     // walls and static objects (trees, rocks, etc.)
                     for (var i = 0; i < lyr.objects.length; i++) {
                         var obj = lyr.objects[i];
@@ -282,7 +282,7 @@ TILEDMapClass = Class.extend({
                         ent.setUpPhysics('static');
                     }
                 }
-                else if (lyr.name == 'spawn') {
+                else if (lyr.name === 'spawn') {
                     // Entities spawn coordinates (width & height are ignored)
                     for (var i = 0; i < lyr.objects.length; i++) {
                         var obj = lyr.objects[i];
@@ -293,18 +293,20 @@ TILEDMapClass = Class.extend({
                             SOLDIER_SIZE,
                                     obj.type,
                                     obj.properties.name ? obj.properties.name : null,
-                                    obj.properties.maxHP ? obj.properties.maxHP : null,
-                                    obj.properties.damage ? obj.properties.damage : null,
-                                    obj.properties.faceAngle ? obj.properties.faceAngle : null,
-                                    obj.properties.speed ? obj.properties.speed : obj.type === 'skeleton' ? DEFAULT_WALKING_VELOCITY * 0.3 : DEFAULT_WALKING_VELOCITY);
+                                    obj.properties.maxHP ? parseFloat(obj.properties.maxHP) : null,
+                                    obj.properties.damage ? parseFloat(obj.properties.damage) : null,
+                                    obj.properties.faceAngle ? parseInt(obj.properties.faceAngle) : null,
+                                    obj.properties.speed ? parseFloat(obj.properties.speed) : obj.type === 'skeleton' ? DEFAULT_WALKING_VELOCITY * ENEMIES_RELATIVE_WALKING_SPEED : DEFAULT_WALKING_VELOCITY,
+                                    obj.properties.attackRange ? parseFloat(obj.properties.attackRange) : obj.type === 'skeleton' ? DEFAULT_ATTACK_RANGE * ENEMIES_RELATIVE_ATTACK_RANGE : DEFAULT_ATTACK_RANGE,
+                                    obj.properties.sightRange ? parseFloat(obj.properties.sightRange) : obj.type === 'skeleton' ? DEFAULT_SIGHT_RANGE * ENEMIES_RELATIVE_SIGHT_RANGE : DEFAULT_SIGHT_RANGE);
                             if (ent.soldierType === 'skeleton' && obj.properties && obj.properties.route)
                                 enemies[obj.properties.route] = ent;
                         }
                         else if (obj.name === 'chest' || obj.name === 'heart')
-                            gGameEngine.spawnItem(obj.name, {x: obj.x, y: obj.y}, obj.properties ? obj.properties.value : null);
+                            gGameEngine.spawnItem(obj.name, {x: obj.x, y: obj.y}, obj.properties.value ? parseFloat(obj.properties.value) : null);
                     }
                 }
-                else if (lyr.name == 'routes') {
+                else if (lyr.name === 'routes') {
                     for (var i = 0; i < lyr.objects.length; i++) {
                         var parsedObj = lyr.objects[i];
                         var routeObj = new AiRouteClass(

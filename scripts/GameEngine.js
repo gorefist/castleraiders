@@ -5,16 +5,29 @@
 // TO DO: read debug settings from file/game options rather than hardcoding them
 // Constants for debug
 var DEBUG_SHOW_FPS = true;
-var DEBUG_SHOW_PHYSIC_BODIES = false;   // red = physic bodies, purple = sensors
+var DEBUG_SHOW_PHYSIC_BODIES = false;   // red = physic bodies, purple = attack sensors, blue = sight sensors
 var DEBUG_SHOW_ENTITIES = false; // draws entity array and their ids
 var DEBUG_SHOW_MAP_BOUNDS = false;
 
 // Game constants
-var DEFAULT_WALKING_VELOCITY = 3.0; // in m/s
-var GAME_LOOP_MS = 1000.0 / 60.0;   // # of milliseconds between scene drawings
+var DEFAULT_WALKING_VELOCITY = 3.0; // default walking speed for humans, in m/s.
+var ENEMIES_RELATIVE_WALKING_SPEED = 0.5; // default enemies' walking velocity
+// will be DEFAULT_WALKING_VELOCITY * ENEMIES_RELATIVE_WALKING_SPEED.
+
+var DEFAULT_ATTACK_RANGE = 35; // attack range(radius), in pixels. This will be
+// used to calculte the size of the attack sensor.
+var ENEMIES_RELATIVE_ATTACK_RANGE = 0.65; // relative attack range regards
+// allies' default value.
+
+var DEFAULT_SIGHT_RANGE = 200; // sight range(radius), in pixels. This will be
+// used to calculte the size of the sight sensor to detect enemies.
+var ENEMIES_RELATIVE_SIGHT_RANGE = 1.0; // relative sight range regards allies'
+// default value.
+
+var GAME_LOOP_MS = 1000.0 / 60.0;   // # of milliseconds between scene drawings.
 
 // Constants for physics
-var PIXEL_METER_SCALE = 1.0;          // ratio for pixel-meter conversion. Default is 1.0 (1m : 50px).
+var PIXEL_METER_SCALE = 1.0; // ratio for pixel-meter conversion. Default is 1.0 (1m : 50px).
 var GAME_LOOP_HZ = 1.0 / 60.0;     // 60 Hz = 60 updates per second
 var PHYSICS_VELOCITY_ITERATIONS = 20; // # of iterations for velocity adjustment
 var PHYSICS_POSITION_ITERATIONS = 10; // # of iterations for overlap resolution
@@ -95,35 +108,54 @@ GameEngineClass = Class.extend({
         gPhysicsEngine.create();
         // Set up entities collision response structure
         gPhysicsEngine.addContactListener({
-            // Needed for sensors to work, as they don't trigger the contact
+            // [Sergio D. Jubera]
+            // As every body can have more than 1 fixture (attack sensor, vision
+            // sensor, physic body, etc.) I'll pass the contact fixtures rather
+            // than the owner body, as I need to know exactly which fixtures
+            // are in contact.
+
+            // Needed for sensors to work, as they don't trigger the collision
             // solver.
-            BeginContact: function(bodyA, bodyB) {
-                var uA = bodyA ? bodyA.GetUserData() : null;
-                var uB = bodyB ? bodyB.GetUserData() : null;
+            BeginContact: function(fixtureA, fixtureB) {
+                var uA = fixtureA.GetBody().GetUserData();
+                var uB = fixtureB.GetBody().GetUserData();
                 if (uA !== null) {
                     if (uA.ent !== null && uA.ent.onTouch)
-                        uA.ent.onTouch(bodyB, null);
+                        uA.ent.onTouch(fixtureA, fixtureB);
                 }
 
                 if (uB !== null) {
                     if (uB.ent !== null && uB.ent.onTouch)
-                        uB.ent.onTouch(bodyA, null);
+                        uB.ent.onTouch(fixtureB, fixtureA);
+                }
+            },
+            EndContact: function(fixtureA, fixtureB) {
+                var uA = fixtureA.GetBody().GetUserData();
+                var uB = fixtureB.GetBody().GetUserData();
+                if (uA !== null) {
+                    if (uA.ent !== null && uA.ent.onTouch)
+                        uA.ent.onFinishTouch(fixtureA, fixtureB);
+                }
+
+                if (uB !== null) {
+                    if (uB.ent !== null && uB.ent.onTouch)
+                        uB.ent.onFinishTouch(fixtureB, fixtureA);
                 }
             }//,
             // This would be used in case we would like to modify bodies'
             // trajectories based on impulse after collision, but that's not
             // the case for this game.
-//            PostSolve: function(bodyA, bodyB, impulse) {
-//                var uA = bodyA ? bodyA.GetUserData() : null;
-//                var uB = bodyB ? bodyB.GetUserData() : null;
+//            PostSolve: function(fixtureA, fixtureB, impulse) {
+//                var uA = fixtureA.GetBody().GetUserData();
+//                var uB = fixtureB.GetBody().GetUserData();
 //                if (uA !== null) {
 //                    if (uA.ent !== null && uA.ent.onTouch)
-//                        uA.ent.onTouch(bodyB, null, impulse);
+//                        uA.ent.onTouch(fixtureB, null);
 //                }
 //
 //                if (uB !== null) {
 //                    if (uB.ent !== null && uB.ent.onTouch)
-//                        uB.ent.onTouch(bodyA, null, impulse);
+//                        uB.ent.onTouch(fixtureA, null);
 //                }
 //            }
         });
@@ -137,8 +169,8 @@ GameEngineClass = Class.extend({
     // [Sergio D. Jubera]
     // I needed different params for soldiers (skeletons/humans) than for items
     // (hearts/chests) so I splitted 'spawnEntity' into the followings:
-    spawnSoldier: function(typename, pos, size, soldierType, name, maxHitPoints, damage, faceAngle, speed) {
-        var ent = new (gGameEngine.factory[typename])(pos, size, soldierType, name, maxHitPoints, damage, faceAngle, speed);
+    spawnSoldier: function(typename, pos, size, soldierType, name, maxHitPoints, damage, faceAngle, speed, attackRange, sightRange) {
+        var ent = new (gGameEngine.factory[typename])(pos, size, soldierType, name, maxHitPoints, damage, faceAngle, speed, attackRange, sightRange);
         gGameEngine.entities.push(ent);
         return ent;
     },
@@ -340,12 +372,13 @@ GameEngineClass = Class.extend({
         // Draw map (partially)
         gMap.drawBackground(ctx);
         gGameEngine._drawWorldBounds(); // for debug
-
+        
         // Draw cursor for current soldier
         gGameEngine._drawPointer();
 
         // Draw the rest of the map
         gMap.drawElements(ctx);
+        gPhysicsEngine.drawBodies();    // for debug
 
         // Draw entities ordered by pos.y, to make the pseudo-3D effect
         var orderedEntities = gGameEngine.entities.slice(); //shallow copy
@@ -359,7 +392,6 @@ GameEngineClass = Class.extend({
             if (orderedEntities[i].drawGui)
                 orderedEntities[i].drawGui();
 
-        gPhysicsEngine.drawBodies();    // for debug
         ctx.restore();
 
         gGameEngine._drawDebugInfo();   // for debug

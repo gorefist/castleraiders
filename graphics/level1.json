@@ -142,19 +142,6 @@
                  "y":2281
                 }, 
                 {
-                 "height":28,
-                 "name":"rock",
-                 "properties":
-                    {
-
-                    },
-                 "type":"",
-                 "visible":true,
-                 "width":33,
-                 "x":2282,
-                 "y":1242
-                }, 
-                {
                  "height":37,
                  "name":"wall",
                  "properties":
@@ -363,7 +350,7 @@
                  "y":2535
                 }, 
                 {
-                 "height":28,
+                 "height":31,
                  "name":"rock",
                  "properties":
                     {
@@ -372,21 +359,8 @@
                  "type":"",
                  "visible":true,
                  "width":33,
-                 "x":2444,
-                 "y":1761
-                }, 
-                {
-                 "height":28,
-                 "name":"rock",
-                 "properties":
-                    {
-
-                    },
-                 "type":"",
-                 "visible":true,
-                 "width":33,
-                 "x":1043,
-                 "y":2762
+                 "x":1042,
+                 "y":2756
                 }, 
                 {
                  "height":38,
@@ -491,6 +465,32 @@
                  "width":37,
                  "x":321,
                  "y":2030
+                }, 
+                {
+                 "height":31,
+                 "name":"rock",
+                 "properties":
+                    {
+
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":33,
+                 "x":2443,
+                 "y":1755
+                }, 
+                {
+                 "height":31,
+                 "name":"rock",
+                 "properties":
+                    {
+
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":33,
+                 "x":2283,
+                 "y":1236
                 }],
          "opacity":1,
          "type":"objectgroup",

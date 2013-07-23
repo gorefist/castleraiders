@@ -12,29 +12,24 @@ AiAutomatonClass = Class.extend({
         this.route = new AiRouteClass();
     },
     update: function() {
-        if (this._currentState === 'idle') {
-            var destination = this.route.nextPoint();
+        switch (this._currentState) {
+            case 'idle':
+                var destination = this.route.nextPoint();
 
-            if (destination !== null) {
-                if (distance(this._entity.pos, destination) > 5) {
-                    this.look(destination);
-                    this.moveTo(destination);
-                }
-                else {
-                    var goOnRoute = this.route.moveToNext();
-                    if (!goOnRoute) {
-                        this.stop();
-                        //console.log(this._entity.physBody.GetDefinition().userData.id + " finished route, STOPPING.");
+                if (destination !== null) {
+                    if (distance(this._entity.pos, destination) > 5) {
+                        this.lookAt(destination);
+                        this.moveTo(destination);
                     }
-                    else {
-                        //console.log(this._entity.physBody.GetDefinition().userData.id + " moving to next destination in route: " + this.route.nextPoint().x + "," + this.route.nextPoint().y);
-                    }
+                    else
+                        this.route.moveToNext();
                 }
-            }
-            else {
-                this.stop();
-                //console.log("No next point for " + this._entity.physBody.GetDefinition().userData.id + ", STOPPING.");
-            }
+                else
+                    this._currentState = 'stop';
+                break;
+            case 'stop':
+            default:
+                break;
         }
     },
     // Moves towards the specified point.
@@ -46,14 +41,11 @@ AiAutomatonClass = Class.extend({
     move: function(move_dir) {
         if (this._entity.inputInfo === null)
             this._entity.inputInfo = new InputInfoClass();
-
         var inputInfo = this._entity.inputInfo;
-
         if (move_dir.LengthSquared())
         {
             move_dir.Normalize();
             move_dir.Multiply(this._entity.speed);
-
             inputInfo.walking = true;
             inputInfo.move_dir = move_dir;
         }
@@ -61,29 +53,24 @@ AiAutomatonClass = Class.extend({
             inputInfo.walking = false;
     },
     // Look at specified point (quantized).
-    look: function(point) {
+    lookAt: function(point) {
         var look_dir = new Vec2(point.x - this._entity.pos.x, point.y - this._entity.pos.y);
-
         if (this._entity.inputInfo === null)
             this._entity.inputInfo = new InputInfoClass();
-
         this._entity.inputInfo.faceAngle0to3 = quantizeAngle(look_dir, 4);
     },
     // Do attack.
     attack: function() {
         if (this._entity.inputInfo === null)
             this._entity.inputInfo = new InputInfoClass();
-
         this._entity.inputInfo.fire0 = true;
     },
     stop: function() {
         if (this._entity.inputInfo === null)
             this._entity.inputInfo = new InputInfoClass();
-
         var inputInfo = this._entity.inputInfo;
         inputInfo.move_dir = new Vec2(0, 0);
         inputInfo.walking = false;
-        
         this._currentState = 'stop';
     }
 });

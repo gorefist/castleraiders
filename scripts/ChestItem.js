@@ -74,6 +74,9 @@ ChestItemClass = EntityClass.extend({
 
         // TO DO: add a visual for damage effect
     },
+    // Setting the item as sensor rather than a physic body, enemies can pass
+    // through them without collisions. Otherwise they would collide, having to
+    // modify their path.
     setUpPhysics: function(bodyType) {
         this.parent(bodyType);
         var fixture = this.physBody.GetFixtureList();
