@@ -26,13 +26,14 @@
         <script type="text/javascript" src="scripts/InstancedEffect.js"></script>
         <script type="text/javascript" src="scripts/TILEDMap.js"></script>
         <script type="text/javascript" src="scripts/InputInfo.js"></script>
-        
+
         <!-- AI classes -->
         <script type="text/javascript" src="scripts/AI/AiRoute.js"></script>
         <script type="text/javascript" src="scripts/AI/AiEngine.js"></script>
         <script type="text/javascript" src="scripts/AI/AiAutomaton.js"></script>
         <script type="text/javascript" src="scripts/AI/AiAutomaton_Human.js"></script>
         <script type="text/javascript" src="scripts/AI/AiAutomaton_Skeleton.js"></script>
+        <script type="text/javascript" src="scripts/SoundManager.js"></script>
 
         <script type="text/javascript">
             // [Sergio D. Jubera]
@@ -46,52 +47,48 @@
                             window.setTimeout(callback, GAME_LOOP_MS);
                         };
             })();
+
+            var animloop = function() {
+                requestAnimFrame(animloop);
+                //animate();
+                gGameEngine.run();
+            };
+
+            function showLoadingScreen() {
+                ctx.font = "bold 50px sans-serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "center";
+                ctx.fillStyle = "#000000";
+                ctx.fillText("Loading...", canvas.width * 0.5, canvas.height * 0.5);
+            }
         </script>
 
     </head>
     <body oncontextmenu="return false;"> <!-- to disable right click on canvas -->
 
-    <canvas id="game_canvas" width="1200" height="500"></canvas>
+    <canvas id="game_canvas"></canvas>
 
     <script type="text/javascript">
 
-        // 1. Initializations
+        // 1. Page initializations (just setup drawing area and context)
         var canvas = document.getElementById('game_canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
         var ctx = canvas.getContext('2d');
 
-        var gAnimationsLoaded = false; //used to await assets loading
-
         // 2. Load assets
-
+        showLoadingScreen();
         gGameEngine.loadAssets(); //loads animations & map graphics and metadata
 
-        // 3. Setup engines
+        checkWait(gGameEngine.assetLoadingComplete, function() {
+            // 3. Setup engines    
+            gInputEngine.setup();
+            gGameEngine.setup();
 
-        var gSetupComplete = false;
-        //gInputEngine.setup();
-        //gGameEngine.setup();
-
-        // 4. Run!!
-
-        var animate = function() {
-            if (!gAnimationsLoaded || !gMap.fullyLoaded)
-                return;
-
-            if (!gSetupComplete)
-            {
-                gInputEngine.setup();
-                gGameEngine.setup();    //Includes PhysEng setup
-                gSetupComplete = true;
-            }
-
-            gGameEngine.run();
-        };
-
-        //setInterval(animate, 1000.0 / 60.0); //Improve performance with the following:
-        (function animloop() {
-            requestAnimFrame(animloop);
-            animate();
-        })();
+            // 4. Run!!
+            //setInterval(gGameEngine.run(), 1000.0 / 60.0); //Improve performance with the following:
+            animloop();
+        });
     </script>
 </body>
 

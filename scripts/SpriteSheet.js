@@ -34,12 +34,16 @@ SpriteSheetClass = Class.extend({
     // Load the atlas at the path 'imgName' into
     // memory. This is similar to how we've
     // loaded images in previous units.
-    load: function(imgName) {
+    // [Sergio D. Jubera] Added the callback function. This way I'll be able
+    // to notify gGameEngine that async loading has finished.
+    load: function(imgName, callback) {
         // Store the URL of the spritesheet we want.
         this.url = imgName;
 
         // Create a new image whose source is at 'imgName'.
         var img = new Image();
+        if (callback)
+            img.onload = callback();
         img.src = imgName;
 
         // Store the Image object in the img parameter.

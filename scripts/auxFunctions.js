@@ -133,9 +133,28 @@ function calculateViewPortTranslation()
 // time in calculations and drawings of things outside the current view port.
 function isInsideViewPort(pos, size) {
     var trV = calculateViewPortTranslation();
-    
+
     return !(((pos.x + size.w * 0.5 + trV.x) < 0) ||
             ((pos.x - size.w * 0.5 + trV.x) > canvas.width) ||
             ((pos.y + size.h * 0.5 + trV.y) < 0) ||
             ((pos.y - size.h * 0.5 + trV.y) > canvas.height));
+}
+
+// This is from GRITS code. It checks the conditionFunction and, if it returns
+// FALSE, waits "waitMs" milliseconds and call the function again. This will be
+// happening until the conditionFunction returs TRUE. Then, it will call the
+// resultFunction and finish. Default interval between calls to
+// conditionFunction is 1 second (1000 ms). This is specially useful when
+// waiting for some condition to be TRUE before execute some code (e.g.: 
+// wait for all assets to be loaded in order to start running the game).
+function checkWait(conditionFunction, resultFunction, waitMs)
+{
+    var tev = setInterval(function()
+    {
+        if (conditionFunction())
+        {
+            resultFunction();
+            clearInterval(tev);
+        }
+    }, waitMs? waitMs : 1000);
 }

@@ -64,6 +64,8 @@ var MAP_ASSETS_SUBFOLDER = 'graphics';  // Subfolder from root (folder with inde
 
 // Game options (they should be set by users via game GUI, and read consequently).
 var OPTIONS_FRIENDLY_FIRE = false;
+var SOUND_FX_VOLUME = 1.0;
+var SOUND_MUSIC_VOLUME = 1.0;
 
 GameEngineClass = Class.extend({
     _currentSoldierIdx: null, // [Sergio D. Jubera] This will point at the 
@@ -80,26 +82,64 @@ GameEngineClass = Class.extend({
     frameCount: 0,
     timeSinceLastFpsCheck: 0, // seconds
     lastFps: 0,
+    assetsLoaded: {},
+    soundtrack: null,
     //-----------------------------
     init: function() {
         this.lastUpdate = new Date();
+
+        // Image files
+        this.assetsLoaded["graphics/animation_sprites.png"] = false;
+        this.assetsLoaded["graphics/level1.png"] = false;
+
+        // Audio files
+        this.assetsLoaded["audio/FiveArmiesBGST.ogg"] = false;
+    },
+    // TO DO: move asset loading to a separate class.
+    assetLoadingComplete: function() {
+        for (var asset in gGameEngine.assetsLoaded) {
+            if (!gGameEngine.assetsLoaded[asset]) {
+                console.log("Assets not ready yet (" + asset + ")...");
+                return false;
+            }
+        }
+        
+        if (gMap.fullyLoaded) {
+            console.log("Asset loading complete!!");
+            return true;
+        }
+        else {
+            console.log("Assets not ready yet (map)...");
+        }
+            
     },
     loadAssets: function() {
+
+
+        // Launch async loadings
         xhrGet("./graphics/animation_sprites.json",
                 function(data) {
                     var sheet = new SpriteSheetClass();
                     gSpriteSheets['animation'] = sheet;
-                    sheet.load("graphics/animation_sprites.png");
+                    sheet.load("graphics/animation_sprites.png", function() {
+                        gGameEngine.assetsLoaded["graphics/animation_sprites.png"] = true;
+                    });
                     sheet.parseAtlasDefinition(data.response);
-                    gAnimationsLoaded = true;
                 }, null);
 
         // TO DO: unhardcode this so that level map depends on game progress or
         // settings file or game options
         var sheet = new SpriteSheetClass();
         gSpriteSheets['map'] = sheet;
-        sheet.load("graphics/level1.png");
-        gMap.load("graphics/level1.json");
+        sheet.load("graphics/level1.png", function() {
+            gGameEngine.assetsLoaded["graphics/level1.png"] = true;
+            gMap.load("graphics/level1.json");
+        });
+
+        gSM.loadAsync("audio/FiveArmiesBGST.ogg", function() {
+            gGameEngine.assetsLoaded["audio/FiveArmiesBGST.ogg"] = true;
+            gGameEngine.soundtrack = new Sound("audio/FiveArmiesBGST.ogg");
+        });
     },
     //-----------------------------
     setup: function() {
@@ -165,6 +205,10 @@ GameEngineClass = Class.extend({
         // Set user control to first human
         gGameEngine._currentSoldierIdx = 0;
         gGameEngine.nextSoldier();
+        
+        // Play soundtrack
+        //playSoundInstance("audio/FiveArmiesBGST.ogg");
+        gGameEngine.soundtrack.play(true,SOUND_MUSIC_VOLUME);
     },
     // [Sergio D. Jubera]
     // I needed different params for soldiers (skeletons/humans) than for items
@@ -257,11 +301,11 @@ GameEngineClass = Class.extend({
         gGameEngine._currentSoldierIdx = gGameEngine._currentSoldierIdx - currentSoldierIdxUpdate < 0 ?
                 gGameEngine.entities.length - currentSoldierIdxUpdate + gGameEngine._currentSoldierIdx :
                 gGameEngine._currentSoldierIdx - currentSoldierIdxUpdate;
-        
+
         // TO DO: check if there's at least one human, or game is over (lose)
         if (gGameEngine.currentSoldier().soldierType !== 'human')
             gGameEngine.nextSoldier();
-        
+
         // [Sergio D. Jubera]
         // The following is based on the GRITS code
 
@@ -290,7 +334,7 @@ GameEngineClass = Class.extend({
 
         var mouseX = gInputEngine.mouse.x - v.x;
         var mouseY = gInputEngine.mouse.y - v.y;
-        
+
         var look_dir = new Vec2(mouseX - gGameEngine.currentSoldier().pos.x, mouseY - gGameEngine.currentSoldier().pos.y);
         inputInfo.faceAngle0to3 = quantizeAngle(look_dir, 4);
 
@@ -372,7 +416,7 @@ GameEngineClass = Class.extend({
         // Draw map (partially)
         gMap.drawBackground(ctx);
         gGameEngine._drawWorldBounds(); // for debug
-        
+
         // Draw cursor for current soldier
         gGameEngine._drawPointer();
 
