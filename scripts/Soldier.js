@@ -31,6 +31,8 @@ SoldierClass = EntityClass.extend({
     entitiesInAttackRange: [], // if this ent attacks, will potentially inflict
     // damage to the entities in this array.
     enemiesInSightRange: [], // enemies detected visually, this will be used by
+    attackCoolDownLapse: DEFAULT_ATTACK_COOLDOWN, // # of milliseconds between attacks.
+    attackCoolDownState: 0, // remaining cool down time.
     // the AI engine.
     // The following attributes are used for animations
     currentState: {
@@ -76,6 +78,8 @@ SoldierClass = EntityClass.extend({
             // this.isDead = true;
             this.physBody.SetActive(false);
         }
+        if (this.attackCoolDownState > 0)
+            this.attackCoolDownState -= GAME_LOOP_MS;
         this.animate();
     },
     applyInputs: function() {
@@ -158,12 +162,14 @@ SoldierClass = EntityClass.extend({
         }
     },
     _attack: function() {
-        this.currentState.action = 'attack';
+//        // Check it's the very beginning of the attack, so that damage is
+//        // triggered just once. If that's the case, inflict damage to all
+//        // entities in attack range and face angle:
+        if (this.attackCoolDownState <= 0) {
+            this.currentState.action = 'attack';
 
-        // Check it's the very beginning of the attack, so that damage is
-        // triggered just once. If that's the case, inflict damage to all
-        // entities in attack range and face angle:
-        if (Math.ceil(this._currentAnim().currentFrame) === 0) {
+//        if (Math.ceil(this._currentAnim().currentFrame) === 0) {
+
             //console.log(this.physBody.GetUserData().id + " attacks.");
 
             for (var i = 0; i < this.entitiesInAttackRange.length; i++) {
@@ -180,6 +186,8 @@ SoldierClass = EntityClass.extend({
                     }
                 }
             }
+            this.attackCoolDownState = this.attackCoolDownLapse;
+            this.stop();
         }
     },
     _resetAnimation: function() {
@@ -265,7 +273,7 @@ SoldierClass = EntityClass.extend({
     },
     onFinishTouch: function(thisFixture, otherFixture) {
         var otherEnt = otherFixture.GetBody().GetUserData().ent;
-        
+
         if (otherEnt instanceof SoldierClass && otherFixture.GetUserData().name === 'physBody') {
             if (thisFixture.GetUserData().name === 'attackSensor' &&
                     (OPTIONS_FRIENDLY_FIRE || otherEnt.soldierType !== this.soldierType)) {

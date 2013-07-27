@@ -16,13 +16,17 @@ var ENEMIES_RELATIVE_WALKING_SPEED = 0.5; // default enemies' walking velocity
 
 var DEFAULT_ATTACK_RANGE = 35; // attack range(radius), in pixels. This will be
 // used to calculte the size of the attack sensor.
-var ENEMIES_RELATIVE_ATTACK_RANGE = 0.65; // relative attack range regards
-// allies' default value.
+var ENEMIES_RELATIVE_ATTACK_RANGE = 0.65; // relative attack range for enemies, 
+// regards allies' default value.
 
 var DEFAULT_SIGHT_RANGE = 200; // sight range(radius), in pixels. This will be
 // used to calculte the size of the sight sensor to detect enemies.
-var ENEMIES_RELATIVE_SIGHT_RANGE = 1.0; // relative sight range regards allies'
-// default value.
+var ENEMIES_RELATIVE_SIGHT_RANGE = 1.0; // relative sight range for enemies, 
+// regards allies' default value.
+
+var DEFAULT_ATTACK_COOLDOWN = 500;  // # of milliseconds before next attack is allowed.
+var ENEMIES_RELATIVE_ATTACK_COOLDOWN = 2.0; // relative cooldown time for
+// enemies, regards allies' default value.
 
 var GAME_LOOP_MS = 1000.0 / 60.0;   // # of milliseconds between scene drawings.
 
@@ -103,7 +107,7 @@ GameEngineClass = Class.extend({
                 return false;
             }
         }
-        
+
         if (gMap.fullyLoaded) {
             console.log("Asset loading complete!!");
             return true;
@@ -111,7 +115,7 @@ GameEngineClass = Class.extend({
         else {
             console.log("Assets not ready yet (map)...");
         }
-            
+
     },
     loadAssets: function() {
 
@@ -136,10 +140,14 @@ GameEngineClass = Class.extend({
             gMap.load("graphics/level1.json");
         });
 
-        gSM.loadAsync("audio/FiveArmiesBGST.ogg", function() {
+        if (gSM.enabled) {
+            gSM.loadAsync("audio/FiveArmiesBGST.ogg", function() {
+                gGameEngine.assetsLoaded["audio/FiveArmiesBGST.ogg"] = true;
+                gGameEngine.soundtrack = new Sound("audio/FiveArmiesBGST.ogg");
+            });
+        }
+        else
             gGameEngine.assetsLoaded["audio/FiveArmiesBGST.ogg"] = true;
-            gGameEngine.soundtrack = new Sound("audio/FiveArmiesBGST.ogg");
-        });
     },
     //-----------------------------
     setup: function() {
@@ -205,10 +213,10 @@ GameEngineClass = Class.extend({
         // Set user control to first human
         gGameEngine._currentSoldierIdx = 0;
         gGameEngine.nextSoldier();
-        
+
         // Play soundtrack
         //playSoundInstance("audio/FiveArmiesBGST.ogg");
-        gGameEngine.soundtrack.play(true,SOUND_MUSIC_VOLUME);
+        gGameEngine.soundtrack.play(true, SOUND_MUSIC_VOLUME);
     },
     // [Sergio D. Jubera]
     // I needed different params for soldiers (skeletons/humans) than for items

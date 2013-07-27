@@ -17,13 +17,13 @@ SoundManager = Class.extend({
     init: function() {
         try {
             this._context = new webkitAudioContext();
+            this._mainNode = this._context.createGainNode(0);
+            this._mainNode.connect(this._context.destination);
         } catch (e) {
             //alert('Web Audio API is not supported in this browser');
             alert(e.message);
+            this.enabled = false;
         }
-
-        this._mainNode = this._context.createGainNode(0);
-        this._mainNode.connect(this._context.destination);
     },
     //----------------------------
     // Parameters:
@@ -34,59 +34,62 @@ SoundManager = Class.extend({
     //                  object as a parameter.
     //----------------------------
     loadAsync: function(path, callbackFcn) {
-        if (gSM.clips[path]) {
-            callbackFcn(gSM.clips[path].s);
-            return gSM.clips[path].s;
+        if (this.enabled) {
+            if (this.clips[path]) {
+                callbackFcn(this.clips[path].s);
+                return this.clips[path].s;
+            }
+
+            var clip = {
+                s: new Sound(),
+                b: null,
+                l: false
+            };
+            this.clips[path] = clip;
+            clip.s.path = path;
+
+            var request = new XMLHttpRequest();
+            request.open('GET', path, true);
+            request.responseType = 'arraybuffer';
+            request.onload = function() {
+                gSM._context.decodeAudioData(request.response,
+                        function(buffer) {
+                            gSM.clips[path].b = buffer;
+                            gSM.clips[path].l = true;
+                            callbackFcn(gSM.clips[path].s);
+                        },
+                        function(data) {
+                        });
+
+            };
+            request.send();
+
+
+            return clip.s;
         }
-
-        var clip = {
-            s: new Sound(),
-            b: null,
-            l: false
-        };
-        gSM.clips[path] = clip;
-        clip.s.path = path;
-
-        var request = new XMLHttpRequest();
-        request.open('GET', path, true);
-        request.responseType = 'arraybuffer';
-        request.onload = function() {
-            gSM._context.decodeAudioData(request.response,
-                    function(buffer) {
-                        gSM.clips[path].b = buffer;
-                        gSM.clips[path].l = true;
-                        callbackFcn(gSM.clips[path].s);
-                    },
-                    function(data) {
-                    });
-
-        };
-        request.send();
-
-
-        return clip.s;
-
     },
     //----------------------------
     togglemute: function() {
         // Check if the gain value of the main node is 
         // 0. If so, set it to 1. Otherwise, set it to 0.
-        if (gSM._mainNode.gain.value > 0) {
-            gSM._mainNode.gain.value = 0;
+        if (this._mainNode.gain.value > 0) {
+            this._mainNode.gain.value = 0;
         }
         else {
-            gSM._mainNode.gain.value = 1;
+            this._mainNode.gain.value = 1;
         }
     },
     //----------------------------
     stopAll: function()
     {
-        // Disconnect the main node, then create a new 
-        // Gain Node, attach it to the main node, and 
-        // connect it to the audio context's destination. 
-        gSM._mainNode.disconnect();
-        gSM._mainNode = gSM._context.createGainNode(0);
-        gSM._mainNode.connect(gSM._context.destination);
+        if (this.enabled) {
+            // Disconnect the main node, then create a new 
+            // Gain Node, attach it to the main node, and 
+            // connect it to the audio context's destination. 
+            this._mainNode.disconnect();
+            this._mainNode = this._context.createGainNode(0);
+            this._mainNode.connect(this._context.destination);
+        }
     },
     //----------------------------
     // Parameters:
@@ -105,7 +108,7 @@ SoundManager = Class.extend({
     playSound: function(path, settings) {
         // Check if the Sound Manager has been enabled,
         // return false if not.
-        if (!gSM.enabled)
+        if (!this.enabled)
             return false;
 
         // Set default values for looping and volume.
@@ -135,8 +138,8 @@ SoundManager = Class.extend({
 
         // create a new buffer source for the sound we want
         // to play. We can do this by calling the 'createBufferSource'
-        // method of gSM._context.
-        currentClip = gSM._context.createBufferSource();
+        // method of this._context.
+        currentClip = this._context.createBufferSource();
 
         // Set the properties of currentClip appropriately in order to
         // play the sound.
@@ -146,7 +149,7 @@ SoundManager = Class.extend({
 
         // Connect currentClip to the main node, then play it. We can do
         // this using the 'connect' and 'noteOn' methods of currentClip.
-        currentClip.connect(gSM._mainNode);
+        currentClip.connect(this._mainNode);
         currentClip.noteOn(0);
 
         return true;
@@ -169,7 +172,7 @@ Sound = Class.extend({
 //----------------------------
 function playSoundInstance(soundpath) {
     // Load a new Sound object, then call its play method.
-    gSM.loadAsync(soundpath, function(sObj) {
+    this.loadAsync(soundpath, function(sObj) {
         sObj.play(false);
     });
 }
