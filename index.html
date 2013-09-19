@@ -70,6 +70,7 @@
 
     <script type="text/javascript">
         var canvas = document.getElementById('game_canvas');
+        var ctx = canvas.getContext('2d');
         
         var is_chrome = /chrome/i.test(navigator.userAgent);
         if (is_chrome) {
@@ -78,7 +79,7 @@
 
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            var ctx = canvas.getContext('2d');
+            
 
             // 2. Load assets
             showLoadingScreen();
@@ -95,7 +96,11 @@
             });
         }
         else {
-            window.alert(msg);
+            ctx.font = "bold 10px sans-serif";
+            ctx.textAlign = "left";
+            ctx.textBaseline = "top";
+            ctx.fillStyle = "black";
+            ctx.fillText("Only Google Chrome is supported for this dev. version.", 5, 5);
         }
     </script>
 </body>
