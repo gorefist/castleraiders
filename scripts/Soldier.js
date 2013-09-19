@@ -42,7 +42,7 @@ SoldierClass = EntityClass.extend({
     animations: {}, // dictionary for all animations, "currentState" will be
     // used as key
     ai: null, // automaton controlling character's AI
-    init: function(pos, size, soldierType, name, maxHitPoints, damage, faceAngle, speed, attackRange, sightRange) {
+    init: function(pos, size, soldierType, name, maxHitPoints, damage, faceAngle, speed, attackRange, sightRange, coolDown) {
         this.parent(pos, size);
         this.soldierType = soldierType;
         if (name)
@@ -56,6 +56,8 @@ SoldierClass = EntityClass.extend({
             this.currentState.dir = isNaN(faceAngle) ? faceAngle : faceAngleToString(faceAngle);
         if (speed)
             this.speed = speed;
+        if (coolDown)
+            this.attackCoolDownLapse = coolDown;
 
         this.setUpPhysics('dynamic', attackRange, sightRange);
         this._setupAnimations();

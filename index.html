@@ -69,26 +69,34 @@
     <canvas id="game_canvas"></canvas>
 
     <script type="text/javascript">
-
-        // 1. Page initializations (just setup drawing area and context)
         var canvas = document.getElementById('game_canvas');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        var ctx = canvas.getContext('2d');
+        
+        var is_chrome = /chrome/i.test(navigator.userAgent);
+        if (is_chrome) {
 
-        // 2. Load assets
-        showLoadingScreen();
-        gGameEngine.loadAssets(); //loads animations & map graphics and metadata
+            // 1. Page initializations (just setup drawing area and context)
 
-        checkWait(gGameEngine.assetLoadingComplete, function() {
-            // 3. Setup engines    
-            gInputEngine.setup();
-            gGameEngine.setup();
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            var ctx = canvas.getContext('2d');
 
-            // 4. Run!!
-            //setInterval(gGameEngine.run(), 1000.0 / 60.0); //Improve performance with the following:
-            animloop();
-        });
+            // 2. Load assets
+            showLoadingScreen();
+            gGameEngine.loadAssets(); //loads animations & map graphics and metadata
+
+            checkWait(gGameEngine.assetLoadingComplete, function() {
+                // 3. Setup engines    
+                gInputEngine.setup();
+                gGameEngine.setup();
+
+                // 4. Run!!
+                //setInterval(gGameEngine.run(), 1000.0 / 60.0); //Improve performance with the following:
+                animloop();
+            });
+        }
+        else {
+            window.alert(msg);
+        }
     </script>
 </body>
 

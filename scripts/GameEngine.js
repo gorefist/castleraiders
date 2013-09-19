@@ -24,7 +24,7 @@ var DEFAULT_SIGHT_RANGE = 200; // sight range(radius), in pixels. This will be
 var ENEMIES_RELATIVE_SIGHT_RANGE = 1.0; // relative sight range for enemies, 
 // regards allies' default value.
 
-var DEFAULT_ATTACK_COOLDOWN = 500;  // # of milliseconds before next attack is allowed.
+var DEFAULT_ATTACK_COOLDOWN = 250;  // # of milliseconds before next attack is allowed.
 var ENEMIES_RELATIVE_ATTACK_COOLDOWN = 2.0; // relative cooldown time for
 // enemies, regards allies' default value.
 
@@ -221,8 +221,8 @@ GameEngineClass = Class.extend({
     // [Sergio D. Jubera]
     // I needed different params for soldiers (skeletons/humans) than for items
     // (hearts/chests) so I splitted 'spawnEntity' into the followings:
-    spawnSoldier: function(typename, pos, size, soldierType, name, maxHitPoints, damage, faceAngle, speed, attackRange, sightRange) {
-        var ent = new (gGameEngine.factory[typename])(pos, size, soldierType, name, maxHitPoints, damage, faceAngle, speed, attackRange, sightRange);
+    spawnSoldier: function(typename, pos, size, soldierType, name, maxHitPoints, damage, faceAngle, speed, attackRange, sightRange, coolDown) {
+        var ent = new (gGameEngine.factory[typename])(pos, size, soldierType, name, maxHitPoints, damage, faceAngle, speed, attackRange, sightRange, coolDown);
         gGameEngine.entities.push(ent);
         return ent;
     },

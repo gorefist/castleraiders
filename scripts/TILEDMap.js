@@ -298,7 +298,8 @@ TILEDMapClass = Class.extend({
                                     obj.properties.faceAngle ? parseInt(obj.properties.faceAngle) : null,
                                     obj.properties.speed ? parseFloat(obj.properties.speed) : obj.type === 'skeleton' ? DEFAULT_WALKING_VELOCITY * ENEMIES_RELATIVE_WALKING_SPEED : DEFAULT_WALKING_VELOCITY,
                                     obj.properties.attackRange ? parseFloat(obj.properties.attackRange) : obj.type === 'skeleton' ? DEFAULT_ATTACK_RANGE * ENEMIES_RELATIVE_ATTACK_RANGE : DEFAULT_ATTACK_RANGE,
-                                    obj.properties.sightRange ? parseFloat(obj.properties.sightRange) : obj.type === 'skeleton' ? DEFAULT_SIGHT_RANGE * ENEMIES_RELATIVE_SIGHT_RANGE : DEFAULT_SIGHT_RANGE);
+                                    obj.properties.sightRange ? parseFloat(obj.properties.sightRange) : obj.type === 'skeleton' ? DEFAULT_SIGHT_RANGE * ENEMIES_RELATIVE_SIGHT_RANGE : DEFAULT_SIGHT_RANGE,
+                                    obj.properties.coolDown ? parseFloat(obj.properties.coolDown) : obj.type === 'skeleton' ? DEFAULT_ATTACK_COOLDOWN * ENEMIES_RELATIVE_ATTACK_COOLDOWN : DEFAULT_ATTACK_COOLDOWN);
                             if (ent.soldierType === 'skeleton' && obj.properties && obj.properties.route)
                                 enemies[obj.properties.route] = ent;
                         }
