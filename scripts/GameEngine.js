@@ -4,6 +4,8 @@
 
 // TO DO: read debug settings from file/game options rather than hardcoding them
 // Constants for debug
+var DEBUG_SHOW_DEBUGVARS = true;
+
 var DEBUG_SHOW_FPS = true;
 var DEBUG_SHOW_PHYSIC_BODIES = false;   // red = physic bodies, purple = attack sensors, blue = sight sensors
 var DEBUG_SHOW_ENTITIES = false; // draws entity array and their ids
@@ -446,6 +448,7 @@ GameEngineClass = Class.extend({
 
         ctx.restore();
 
+        gGameEngine._drawControls();
         gGameEngine._drawDebugInfo();   // for debug
     },
     // [Sergio D. Jubera]
@@ -479,10 +482,39 @@ GameEngineClass = Class.extend({
         drawOval(ctx, gGameEngine.currentSoldier().pos.x, gGameEngine.currentSoldier().pos.y + CURSOR_OFFSET + SOLDIER_ANIM_OFFSET.y, 2, 1, CURSOR_RADIUS);
         ctx.restore();
     },
-    // Debug functions
+    
+    _drawControls: function()
+    {
+        ctx.font = "13px sans-serif";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "top";
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText("W = move up", 10, canvas.height - 115);
+        ctx.fillText("A = move left", 10, canvas.height - 100);
+        ctx.fillText("S = move down", 10, canvas.height - 85);
+        ctx.fillText("D = move right", 10, canvas.height - 70);
+        ctx.fillText("Left click = attack", 10, canvas.height - 55);
+        ctx.fillText("Mouse move = look around", 10, canvas.height - 40);
+        ctx.fillText("Space bar = select next soldier", 10, canvas.height - 25);
+    },
 
+    // Debug functions
     _drawDebugInfo: function()
     {
+        if (DEBUG_SHOW_DEBUGVARS)
+        {
+            // Show FPS
+            ctx.font = "13px sans-serif";
+            ctx.textAlign = "left";
+            ctx.textBaseline = "top";
+            ctx.fillStyle = "#ffffff";
+            ctx.fillText("DEBUG_SHOW_FPS = " + DEBUG_SHOW_FPS.toString(), 5, 5);
+            ctx.fillText("DEBUG_SHOW_PHYSIC_BODIES = " + DEBUG_SHOW_PHYSIC_BODIES.toString(), 5, 20);
+            ctx.fillText("DEBUG_SHOW_ENTITIES = " + DEBUG_SHOW_ENTITIES.toString(), 5, 35);
+            ctx.fillText("DEBUG_SHOW_MAP_BOUNDS = " + DEBUG_SHOW_MAP_BOUNDS.toString(), 5, 50);
+        }
+            
+        
         if (DEBUG_SHOW_FPS)
         {
             // Show FPS
