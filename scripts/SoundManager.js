@@ -17,7 +17,8 @@ SoundManager = Class.extend({
     init: function() {
         try {
             this._context = new webkitAudioContext();
-            this._mainNode = this._context.createGainNode(0);
+            this._mainNode = this._context. //createGainNode(0);
+                                           createGain(0);
             this._mainNode.connect(this._context.destination);
         } catch (e) {
             //alert('Web Audio API is not supported in this browser');
@@ -144,13 +145,15 @@ SoundManager = Class.extend({
         // Set the properties of currentClip appropriately in order to
         // play the sound.
         currentClip.buffer = sd.b; // tell the source which sound to play
-        currentClip.gain.value = volume;
+        var gain = this._context.createGain();
+        currentClip.connect(gain);
+        gain.gain.value = volume;
         currentClip.loop = looping;
 
         // Connect currentClip to the main node, then play it. We can do
         // this using the 'connect' and 'noteOn' methods of currentClip.
         currentClip.connect(this._mainNode);
-        currentClip.noteOn(0);
+        currentClip.start(0);
 
         return true;
     }
